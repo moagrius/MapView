@@ -31,5 +31,7 @@ mapView.addMarker(someView, 42.35848, -71.063736);
 mapView.addMarker(anotherView, 42.3665, -71.05224);
 </pre>
 
+<p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation">here</a>.
+
  <p>Licensed under <a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons</a></p>
 </p>
