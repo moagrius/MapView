@@ -579,9 +579,8 @@ mapView.addZoomLevel("level2/%col%-%row%.jpg");  // will be 125x125</pre>
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
 			if (child.getVisibility() != GONE) {
-				FixedLayout.LayoutParams lp = (FixedLayout.LayoutParams) child.getLayoutParams();
-				int right = lp.x + child.getMeasuredWidth();
-				int bottom = lp.y + child.getMeasuredHeight();
+				int right = child.getMeasuredWidth();
+				int bottom = child.getMeasuredHeight();
 				width = Math.max(width, right);
 				height = Math.max(height, bottom);
 			}
