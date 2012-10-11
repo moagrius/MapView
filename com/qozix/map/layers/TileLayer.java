@@ -345,7 +345,12 @@ public class TileLayer extends FixedLayout {
 		public void onAnimationEnd(Animation a) {
 			numPendingAnimations--;
 			if(numPendingAnimations <= 0){
-				cleanup();
+				post(new Runnable(){
+					@Override
+					public void run(){
+						cleanup();
+					}
+				});
 			}
 		}
 		@Override
