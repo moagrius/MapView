@@ -243,7 +243,11 @@ public class TileLayer extends FixedLayout {
 				removeView(deadLayer);
 			}
 		}
-		downsample.setVisibility(View.VISIBLE);
+
+		if(downsample != null){
+			downsample.setVisibility(View.VISIBLE);
+		}
+
 		deadLayers.clear();
 		
 		isCleaningUp = false;
