@@ -1,3 +1,5 @@
+<p><strong>Update:</strong> This lib is still very early beta, and updating for public use has introduced some bugs and invalid signatures.  Any addZoomLevel signature is failing without a valid asset image path provided for the @downsample parameter.  The complete addZoomLevel signature should be preferred (with or without tilesize).  Updates to come.</p>
+
 <h1>MapView</h1>
 <p>The MapView widget is a subclass of ViewGroup that provides a mechanism to asynchronously display tile-based images,
  with additional functionality for 2D dragging, flinging, pinch or double-tap to zoom, adding overlaying Views (markers),
