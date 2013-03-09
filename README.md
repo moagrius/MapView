@@ -11,6 +11,12 @@
   The <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">documentation</a> has been updated as well.
 </p>
 
+<p>
+  <strong>Dependencies:</strong> Note that this version now requires the 
+  <a target="_blank" href="http://developer.android.com/tools/extras/support-library.html">Android compatability lib</a>
+   and <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">Jake Wharton's DiskLruCache</a> (<a target="_blank" href="https://oss.sonatype.org/content/repositories/releases/com/jakewharton/disklrucache/1.3.1/disklrucache-1.3.1.jar">jar</a>).
+</p>
+
 <p>An quick-n-dirty, undated, unversioned and incomplete changelog:</p>
 
 <ol>
