@@ -97,8 +97,9 @@ mapView.addMarker(anotherView, 42.3665, -71.05224);
   for the LruCache implementation.
 </p>
 <p>
-  <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">Jake Wharton's DiskLruCache</a> (<a target="_blank" href="https://oss.sonatype.org/content/repositories/releases/com/jakewharton/disklrucache/1.3.1/disklrucache-1.3.1.jar">jar</a> is also used.
-  However, this package is bundled with the jar 
+  <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">Jake Wharton's DiskLruCache</a> is also used.
+  <a target="_blank" href="https://oss.sonatype.org/content/repositories/releases/com/jakewharton/disklrucache/1.3.1/disklrucache-1.3.1.jar">Here's</a> a direct link to that jar.
+  However, that package is bundled with mapviewlib.jar so is only needed if you're using the java files directly in your project.
 </p>
 
 <h4>Documentation</h4>
