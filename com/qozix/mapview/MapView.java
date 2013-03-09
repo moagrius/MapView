@@ -109,7 +109,7 @@ public class MapView extends ZoomPanLayout {
 	//------------------------------------------------------------------------------------
 	// PUBLIC API
 	//------------------------------------------------------------------------------------
-    
+
 	//------------------------------------------------------------------------------------
 	// Getters/Setters
 	//------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public class MapView extends ZoomPanLayout {
 	public void removeMapEventListener( MapEventListener listener ) {
 		mapEventListeners.remove( listener );
 	}
-    
+	
 	//------------------------------------------------------------------------------------
 	// Rendering API
 	//------------------------------------------------------------------------------------
@@ -158,23 +158,23 @@ public class MapView extends ZoomPanLayout {
 	 * The request is added to a queue and is not guaranteed to be processed at any particular
 	 * time, and will never be handled immediately.
 	 */
-    public void requestRender(){
-    	tileManager.requestRender();
-    }
-    
-    /**
-     * Notify the map view that it may stop rendering tiles.  The rendering thread will be
-     * attempt to be interrupted, but no guarantee is provided when.
-     */
-    public void cancelRender() {
-    	tileManager.cancelRender();
-    }
+	public void requestRender(){
+		tileManager.requestRender();
+	}
 	
-    //------------------------------------------------------------------------------------
+	/**
+	 * Notify the map view that it may stop rendering tiles.  The rendering thread will be
+	 * attempt to be interrupted, but no guarantee is provided when.
+	 */
+	public void cancelRender() {
+		tileManager.cancelRender();
+	}
+	
+	//------------------------------------------------------------------------------------
 	// Setup API
 	//------------------------------------------------------------------------------------
-    
-    /**
+	
+	/**
 	 * Register a tile set to be used for a particular zoom level.
 	 * Each tile set to be used must be registered using this method,
 	 * and at least one zoom level must be registered for the MapView to render any tiles.
@@ -804,69 +804,69 @@ public class MapView extends ZoomPanLayout {
 		}
 		return points;
 	}
-    
+	
 	//------------------------------------------------------------------------------------
 	// Private Listeners
 	//------------------------------------------------------------------------------------
 
-    private ZoomPanListener zoomPanListener = new ZoomPanListener() {
-    	@Override
-    	public void onZoomPanEvent(){
-    		
-    	}						
-    	@Override
-    	public void onScrollChanged( int x, int y ) {
-    		updateViewport();
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onScrollChanged( x, y );
-    		}
-    	}			
-    	@Override
-    	public void onScaleChanged( double scale ) { 
-    		zoomManager.setScale( scale );
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onScaleChanged( scale );
-    		}
-    	}
-    	@Override
-    	public void onZoomStart( double scale ) {
-    		zoomManager.lockZoom();
-    		zoomManager.setScale( scale );
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onZoomStart( scale );
-    		}
-    	}
-    	@Override
-    	public void onZoomComplete( double scale ) {
-    		zoomManager.unlockZoom();
-    		zoomManager.setScale( scale );
-    		requestRender();  // put this here instead of gesture listener so we catch animations and pinches
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onZoomComplete( scale );
-    		}
-    	}
-    };
-    
-    private ZoomListener zoomListener = new ZoomListener(){
-    	@Override
-    	public void onZoomLevelChanged( int oldZoom, int currentZoom ) {
-    		updateClipFromCurrentZoom();
-    		requestRender();
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onZoomLevelChanged( oldZoom, currentZoom );
-    		}
-    	}
-    	/*
-    	 * do *not* update scale in response to changes in the zoom manager
-    	 * transactions are one-way - set scale on MapView (ZoomPanLayout)
-    	 * and pass those to ZoomManager, which then distributes, manages
-    	 * and notifies all other interested parties.
-    	 */
-    	@Override
-    	public void onZoomScaleChanged( double scale ) {
-    		
-    	}
-    };
+	private ZoomPanListener zoomPanListener = new ZoomPanListener() {
+		@Override
+		public void onZoomPanEvent(){
+			
+		}						
+		@Override
+		public void onScrollChanged( int x, int y ) {
+			updateViewport();
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onScrollChanged( x, y );
+			}
+		}			
+		@Override
+		public void onScaleChanged( double scale ) { 
+			zoomManager.setScale( scale );
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onScaleChanged( scale );
+			}
+		}
+		@Override
+		public void onZoomStart( double scale ) {
+			zoomManager.lockZoom();
+			zoomManager.setScale( scale );
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onZoomStart( scale );
+			}
+		}
+		@Override
+		public void onZoomComplete( double scale ) {
+			zoomManager.unlockZoom();
+			zoomManager.setScale( scale );
+			requestRender();  // put this here instead of gesture listener so we catch animations and pinches
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onZoomComplete( scale );
+			}
+		}
+	};
+	
+	private ZoomListener zoomListener = new ZoomListener(){
+		@Override
+		public void onZoomLevelChanged( int oldZoom, int currentZoom ) {
+			updateClipFromCurrentZoom();
+			requestRender();
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onZoomLevelChanged( oldZoom, currentZoom );
+			}
+		}
+		/*
+		 * do *not* update scale in response to changes in the zoom manager
+		 * transactions are one-way - set scale on MapView (ZoomPanLayout)
+		 * and pass those to ZoomManager, which then distributes, manages
+		 * and notifies all other interested parties.
+		 */
+		@Override
+		public void onZoomScaleChanged( double scale ) {
+			
+		}
+	};
 	
 	private GestureListener gestureListener = new GestureListener(){
 
@@ -878,10 +878,10 @@ public class MapView extends ZoomPanLayout {
 		}
 		@Override
 		public void onDrag( Point point ) {
-    		suppressRender();
-    		for ( MapEventListener listener : mapEventListeners ) {
-    			listener.onDrag( point.x, point.y );
-    		}
+			suppressRender();
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onDrag( point.x, point.y );
+			}
 		}
 		@Override
 		public void onFingerDown( Point point ) {
@@ -945,7 +945,7 @@ public class MapView extends ZoomPanLayout {
 			}
 		}
 	};
-    
+	
 	private TileRenderListener renderListener = new TileRenderListener(){
 		@Override
 		public void onRenderCancelled() {
@@ -1068,5 +1068,5 @@ public class MapView extends ZoomPanLayout {
 		 */
 		public void onRenderComplete();
 	}
-	
+
 }
