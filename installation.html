@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	    <title>MapView</title>
+        <meta charset="UTF-8" />
+		<style type="text/css">
+			body {
+				background: #F5F5F5;
+				margin: 0;
+				padding: 40px;
+				font-family: Tahoma, Geneva, sans-serif;
+				font-size: 13px;
+				line-height: 1.6;
+				color: #445;
+			}
+			#instructions {
+				width: 800px;
+				margin: 0 auto;
+				padding: 20px 40px;
+				border: 1px solid #CCC;
+				background: #FFF;
+			}
+			h1 {
+				font-weight: normal;
+				text-align: center;
+			}
+			li {
+				margin-bottom: 0.3em;
+			}
+		</style>
+    </head>
+    <body>
+		<div id="instructions">
+			
+			<h1>Using MapView in an Android Project (Eclipse)</h1>
+			
+			<ol>
+				<li>Create a folder in your application root (next to bin, src, etc.) named "libs"</li>
+				<li><a href="mapviewlib.jar">Download</a> the .jar file to this folder.</li>
+				<li>In Eclipse, right click on the .jar file and select "Build Path" > "Add to Build Path"</li>
+				<li>That's it.  You can now instantiate normally: new MapView( context );</li>
+			</ol>
+			
+			<p>
+				This widget uses the LruCache for bitmap caching.  If you're targeting API less than 12, you'll need to do the same process (adding the jar to your project's
+				build path) with the <a target="_blank" href="http://developer.android.com/tools/extras/support-library.html">Android Support Library</a>.
+			</p>
+			
+			<p>
+				<em>Jake Wharton's <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">DiskLruCache</a> is also used, but is included
+				in the mapviewlib.jar linked in step 1, so no extra steps are necessary.</em>
+			</p>
+			
+			<p>The github project is <a target="_blank" href="https://github.com/moagrius/MapView">here</a>.  Forks welcome.</a></p>
+			
+			<p>Documentation is <a target="_blank" href="http://moagrius.github.com/MapView/documentation/reference/packages.html">here.</a></p>
+				
+		</div>
+    </body>
+</html>
