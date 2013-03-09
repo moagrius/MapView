@@ -8,7 +8,7 @@
   the previous version in it's entirely should be considered deprecated, and replaced with this release.
 </p>
 <p>
-  I'm also moving documentation off github - it's now <a href="http://android-mapview.com">here</a>.
+  The <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">documentation</a> has been updated as well.
 </p>
 
 <p>An quick-n-dirty, undated, unversioned and incomplete changelog:</p>
@@ -81,6 +81,6 @@ mapView.addMarker(someView, 42.35848, -71.063736);
 mapView.addMarker(anotherView, 42.3665, -71.05224);
 </pre>
 
-<p>Javadocs are <a href="http://android-mapview.com">here</a>.</p>
+<p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">here</a>.</p>
 
 <p>Licensed under <a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons</a></p>
