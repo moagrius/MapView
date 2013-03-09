@@ -38,11 +38,14 @@
   </li>
   <li>
     Removed support for downsamples.  That behavior wasn't visible in most other similar programs (e.g., google maps, CATiledLayer); it seemed to confuse some people; and it really hurt performance.
-    If you want a low-res version, just stick an ImageView behind the MapView (in a FrameLayout or RelativeLayout), and size it to the size of your largest map.
+    I may consider a single low-res image as a background (rather than a different downsample per zoom level), depending on user feedback.
   </li>
   <li>
     Removed support for tile transitions.  There was no way to keep this from eating up too much memory when abused (fast, repeated pinches between zoom levels), when we wanted to keep the previous
     tile set visible until the new one was rendered.
+  </li>
+  <li>
+    Added support for zoom-level specific Markers and Paths - you can now specify a zoom index to addMarker/Path calls, which will hide those Views on all other zoom levels.
   </li>
   <li>
     Drastic refactorization and optimization of the core classes.  
