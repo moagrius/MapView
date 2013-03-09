@@ -1,8 +1,8 @@
 <api>
-<package name="com.qozix.map"
+<package name="com.qozix.mapview"
 >
 <class name="MapView"
- extends="ViewGroup"
+ extends="ZoomPanLayout"
  abstract="false"
  static="false"
  final="false"
@@ -10,7 +10,7 @@
  visibility="public"
 >
 <constructor name="MapView"
- type="com.qozix.map.MapView"
+ type="com.qozix.mapview.MapView"
  static="false"
  final="false"
  deprecated="not deprecated"
@@ -19,22 +19,7 @@
 <parameter name="context" type="Context">
 </parameter>
 </constructor>
-<method name="addHotSpot"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="r" type="Rect">
-</parameter>
-<parameter name="l" type="View.OnClickListener">
-</parameter>
-</method>
-<method name="addMarker"
+<method name="addCallout"
  return="View"
  abstract="false"
  native="false"
@@ -46,7 +31,100 @@
 >
 <parameter name="view" type="View">
 </parameter>
-<parameter name="point" type="Point">
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+</method>
+<method name="addCallout"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="addCallout"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
+</parameter>
+</method>
+<method name="addCallout"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="addHotSpot"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="rectangle" type="Rect">
+</parameter>
+<parameter name="listener" type="View.OnClickListener">
+</parameter>
+</method>
+<method name="addMapEventListener"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="listener" type="com.qozix.mapview.MapView.MapEventListener">
 </parameter>
 </method>
 <method name="addMarker"
@@ -66,8 +144,8 @@
 <parameter name="y" type="double">
 </parameter>
 </method>
-<method name="addOnReadyListener"
- return="void"
+<method name="addMarker"
+ return="View"
  abstract="false"
  native="false"
  synchronized="false"
@@ -76,11 +154,17 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="runnable" type="java.lang.Runnable">
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="absolute" type="boolean">
 </parameter>
 </method>
-<method name="addZoomLevel"
- return="void"
+<method name="addMarker"
+ return="View"
  abstract="false"
  native="false"
  synchronized="false"
@@ -89,11 +173,19 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="pattern" type="java.lang.String">
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
 </parameter>
 </method>
-<method name="addZoomLevel"
- return="void"
+<method name="addMarker"
+ return="View"
  abstract="false"
  native="false"
  synchronized="false"
@@ -102,9 +194,105 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="pattern" type="java.lang.String">
+<parameter name="view" type="View">
 </parameter>
-<parameter name="sample" type="java.lang.String">
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="addMarkerAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="zoom" type="int">
+</parameter>
+</method>
+<method name="addMarkerAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="zoom" type="int">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="addMarkerAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
+</parameter>
+<parameter name="zoom" type="int">
+</parameter>
+</method>
+<method name="addMarkerAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="aX" type="float">
+</parameter>
+<parameter name="aY" type="float">
+</parameter>
+<parameter name="zoom" type="int">
+</parameter>
+<parameter name="absolute" type="boolean">
 </parameter>
 </method>
 <method name="addZoomLevel"
@@ -123,8 +311,6 @@
 </parameter>
 <parameter name="pattern" type="java.lang.String">
 </parameter>
-<parameter name="sample" type="java.lang.String">
-</parameter>
 </method>
 <method name="addZoomLevel"
  return="void"
@@ -141,15 +327,13 @@
 <parameter name="tall" type="int">
 </parameter>
 <parameter name="pattern" type="java.lang.String">
-</parameter>
-<parameter name="sample" type="java.lang.String">
 </parameter>
 <parameter name="tileWidth" type="int">
 </parameter>
 <parameter name="tileHeight" type="int">
 </parameter>
 </method>
-<method name="clearOnReadyListeners"
+<method name="cancelRender"
  return="void"
  abstract="false"
  native="false"
@@ -161,7 +345,7 @@
 >
 </method>
 <method name="drawPath"
- return="void"
+ return="View"
  abstract="false"
  native="false"
  synchronized="false"
@@ -170,11 +354,65 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="points" type="java.util.ArrayList&lt;Point&gt;">
+<parameter name="positions" type="java.util.List&lt;double[]&gt;">
 </parameter>
+</method>
+<method name="drawPath"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="positions" type="double...">
+</parameter>
+</method>
+<method name="drawPathAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="zoom" type="int">
+</parameter>
+<parameter name="positions" type="java.util.List&lt;double[]&gt;">
+</parameter>
+</method>
+<method name="drawPathAtZoom"
+ return="View"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="zoom" type="int">
+</parameter>
+<parameter name="positions" type="double...">
+</parameter>
+</method>
+<method name="getScale"
+ return="double"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
 </method>
 <method name="getZoom"
- return="float"
+ return="int"
  abstract="false"
  native="false"
  synchronized="false"
@@ -184,8 +422,8 @@
  visibility="public"
 >
 </method>
-<method name="initialize"
- return="void"
+<method name="latLngToPixels"
+ return="double[]"
  abstract="false"
  native="false"
  synchronized="false"
@@ -194,9 +432,13 @@
  deprecated="not deprecated"
  visibility="public"
 >
+<parameter name="lat" type="double">
+</parameter>
+<parameter name="lng" type="double">
+</parameter>
 </method>
-<method name="moveTo"
- return="void"
+<method name="latLngToPixels"
+ return="double[]"
  abstract="false"
  native="false"
  synchronized="false"
@@ -205,10 +447,42 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="coordinates" type="double[]">
 </parameter>
 </method>
 <method name="moveTo"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+</method>
+<method name="moveTo"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="moveToAndCenter"
  return="void"
  abstract="false"
  native="false"
@@ -233,22 +507,11 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
-</parameter>
-</method>
-<method name="moveToAndCenter"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
 <parameter name="x" type="double">
 </parameter>
 <parameter name="y" type="double">
+</parameter>
+<parameter name="absolute" type="boolean">
 </parameter>
 </method>
 <method name="onLayout"
@@ -272,19 +535,32 @@
 <parameter name="b" type="int">
 </parameter>
 </method>
-<method name="onMeasure"
- return="void"
+<method name="pixelsToLatLng"
+ return="double[]"
  abstract="false"
  native="false"
  synchronized="false"
  static="false"
  final="false"
  deprecated="not deprecated"
- visibility="protected"
+ visibility="public"
 >
-<parameter name="widthMeasureSpec" type="int">
+<parameter name="x" type="double">
 </parameter>
-<parameter name="heightMeasureSpec" type="int">
+<parameter name="y" type="double">
+</parameter>
+</method>
+<method name="pixelsToLatLng"
+ return="double[]"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="points" type="double[]">
 </parameter>
 </method>
 <method name="registerGeolocator"
@@ -297,30 +573,17 @@
  deprecated="not deprecated"
  visibility="public"
 >
+<parameter name="left" type="double">
+</parameter>
 <parameter name="top" type="double">
 </parameter>
 <parameter name="right" type="double">
 </parameter>
 <parameter name="bottom" type="double">
 </parameter>
-<parameter name="left" type="double">
-</parameter>
 </method>
-<method name="removeHotSpot"
+<method name="removeCallout"
  return="boolean"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="r" type="Rect">
-</parameter>
-</method>
-<method name="removeMarker"
- return="void"
  abstract="false"
  native="false"
  synchronized="false"
@@ -332,7 +595,7 @@
 <parameter name="view" type="View">
 </parameter>
 </method>
-<method name="removeMarkers"
+<method name="removeCallout"
  return="void"
  abstract="false"
  native="false"
@@ -342,21 +605,12 @@
  deprecated="not deprecated"
  visibility="public"
 >
-</method>
-<method name="removeOnReadyListener"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="runnable" type="java.lang.Runnable">
+<parameter name="rectangle" type="Rect">
+</parameter>
+<parameter name="listener" type="View.OnClickListener">
 </parameter>
 </method>
-<method name="setBaseMapSize"
+<method name="removeMapEventListener"
  return="void"
  abstract="false"
  native="false"
@@ -366,10 +620,45 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="width" type="int">
+<parameter name="listener" type="com.qozix.mapview.MapView.MapEventListener">
 </parameter>
-<parameter name="height" type="int">
+</method>
+<method name="removeMarker"
+ return="boolean"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
 </parameter>
+</method>
+<method name="removePath"
+ return="boolean"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="view" type="View">
+</parameter>
+</method>
+<method name="requestRender"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
 </method>
 <method name="setMarkerAnchorPoints"
  return="void"
@@ -381,12 +670,12 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="x" type="float">
+<parameter name="anchorX" type="float">
 </parameter>
-<parameter name="y" type="float">
+<parameter name="anchorY" type="float">
 </parameter>
 </method>
-<method name="setMaxScale"
+<method name="setScale"
  return="void"
  abstract="false"
  native="false"
@@ -396,72 +685,7 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="m" type="double">
-</parameter>
-</method>
-<method name="setMinScale"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="m" type="double">
-</parameter>
-</method>
-<method name="setOnMapEventListener"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="l" type="com.qozix.map.MapView.OnMapEventListener">
-</parameter>
-</method>
-<method name="setScaleToFit"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="value" type="boolean">
-</parameter>
-</method>
-<method name="setTileTransitionDuration"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="d" type="int">
-</parameter>
-</method>
-<method name="setTileTranstionEnabled"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="shouldAnimate" type="boolean">
+<parameter name="scale" type="double">
 </parameter>
 </method>
 <method name="setZoom"
@@ -474,7 +698,7 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="factor" type="float">
+<parameter name="zoom" type="int">
 </parameter>
 </method>
 <method name="slideTo"
@@ -487,10 +711,29 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
 </parameter>
 </method>
 <method name="slideTo"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="double">
+</parameter>
+<parameter name="y" type="double">
+</parameter>
+<parameter name="absolute" type="boolean">
+</parameter>
+</method>
+<method name="slideToAndCenter"
  return="void"
  abstract="false"
  native="false"
@@ -515,35 +758,11 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
-</parameter>
-</method>
-<method name="slideToAndCenter"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
 <parameter name="x" type="double">
 </parameter>
 <parameter name="y" type="double">
 </parameter>
-</method>
-<method name="supressTileSetUpdate"
- return="void"
- abstract="false"
- native="false"
- synchronized="false"
- static="false"
- final="false"
- deprecated="not deprecated"
- visibility="public"
->
-<parameter name="shouldSuppress" type="boolean">
+<parameter name="absolute" type="boolean">
 </parameter>
 </method>
 <method name="unregisterGeolocator"
@@ -558,7 +777,7 @@
 >
 </method>
 </class>
-<interface name="MapView.OnMapEventListener"
+<interface name="MapView.MapEventListener"
  abstract="true"
  static="true"
  final="false"
@@ -575,7 +794,9 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
 </parameter>
 </method>
 <method name="onDrag"
@@ -588,7 +809,9 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
 </parameter>
 </method>
 <method name="onFingerDown"
@@ -601,7 +824,24 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
+</parameter>
+</method>
+<method name="onFingerUp"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
 </parameter>
 </method>
 <method name="onFling"
@@ -614,10 +854,92 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="from" type="Point">
+<parameter name="sx" type="int">
 </parameter>
-<parameter name="to" type="Point">
+<parameter name="sy" type="int">
 </parameter>
+<parameter name="dx" type="int">
+</parameter>
+<parameter name="dy" type="int">
+</parameter>
+</method>
+<method name="onFlingComplete"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="onPinch"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
+</parameter>
+</method>
+<method name="onPinchComplete"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
+</parameter>
+</method>
+<method name="onPinchStart"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
+</parameter>
+</method>
+<method name="onRenderComplete"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="onRenderStart"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
 </method>
 <method name="onScaleChanged"
  return="void"
@@ -629,7 +951,7 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="factor" type="float">
+<parameter name="scale" type="double">
 </parameter>
 </method>
 <method name="onScrollChanged"
@@ -642,7 +964,9 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
 </parameter>
 </method>
 <method name="onTap"
@@ -655,7 +979,9 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="point" type="Point">
+<parameter name="x" type="int">
+</parameter>
+<parameter name="y" type="int">
 </parameter>
 </method>
 <method name="onZoomComplete"
@@ -668,7 +994,35 @@
  deprecated="not deprecated"
  visibility="public"
 >
-<parameter name="factor" type="float">
+<parameter name="scale" type="double">
+</parameter>
+</method>
+<method name="onZoomLevelChanged"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="oldZoom" type="int">
+</parameter>
+<parameter name="currentZoom" type="int">
+</parameter>
+</method>
+<method name="onZoomStart"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="scale" type="double">
 </parameter>
 </method>
 </interface>

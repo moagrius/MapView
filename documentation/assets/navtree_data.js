@@ -1,6 +1,6 @@
 var NAVTREE_DATA =
-[ [ "com.qozix.map", "com/qozix/map/package-summary.html", [ [ "Interfaces", null, [ [ "MapView.OnMapEventListener", "com/qozix/map/MapView.OnMapEventListener.html", null, "" ] ]
-, "" ], [ "Classes", null, [ [ "MapView", "com/qozix/map/MapView.html", null, "" ] ]
+[ [ "com.qozix.mapview", "com/qozix/mapview/package-summary.html", [ [ "Interfaces", null, [ [ "MapView.MapEventListener", "com/qozix/mapview/MapView.MapEventListener.html", null, "" ] ]
+, "" ], [ "Classes", null, [ [ "MapView", "com/qozix/mapview/MapView.html", null, "" ] ]
 , "" ] ]
 , "" ] ]
 
