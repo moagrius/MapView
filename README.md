@@ -11,12 +11,6 @@
   The <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">documentation</a> has been updated as well.
 </p>
 
-<p>
-  <strong>Dependencies:</strong> Note that this version now requires the 
-  <a target="_blank" href="http://developer.android.com/tools/extras/support-library.html">Android compatability lib</a>
-   and <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">Jake Wharton's DiskLruCache</a> (<a target="_blank" href="https://oss.sonatype.org/content/repositories/releases/com/jakewharton/disklrucache/1.3.1/disklrucache-1.3.1.jar">jar</a>).
-</p>
-
 <p>An quick-n-dirty, undated, unversioned and incomplete changelog:</p>
 
 <ol>
@@ -65,7 +59,6 @@
 
 <p>Finally, thanks to everyone that's been in touch with comments and ideas on how to make this widget better.  I appreciate all the input</p>
 
-
 <h1>MapView</h1>
 <p>The MapView widget is a subclass of ViewGroup that provides a mechanism to asynchronously display tile-based images,
  with additional functionality for 2D dragging, flinging, pinch or double-tap to zoom, adding overlaying Views (markers),
@@ -90,6 +83,26 @@ mapView.addMarker(someView, 42.35848, -71.063736);
 mapView.addMarker(anotherView, 42.3665, -71.05224);
 </pre>
 
+<h4>Installation</h4>
+<p>
+  The widget is straight java, so you can just use the .java files found here (with the dependencies mentioned below), or you can download
+  <a href="http://moagrius.github.com/MapView/mapviewlib.jar">the jar</a>.
+  Simple instructions are available <a target="_blank" href="http://moagrius.github.com/MapView/installation.html">here</a>.
+</p>
+
+<h4>Dependencies</h4>
+<p>
+  If you're targetting APIs less than 12, you'll need the 
+  <a target="_blank" href="http://developer.android.com/tools/extras/support-library.html">Android compatability lib</a>
+  for the LruCache implementation.
+</p>
+<p>
+  <a target="_blank" href="https://github.com/JakeWharton/DiskLruCache">Jake Wharton's DiskLruCache</a> (<a target="_blank" href="https://oss.sonatype.org/content/repositories/releases/com/jakewharton/disklrucache/1.3.1/disklrucache-1.3.1.jar">jar</a> is also used.
+  However, this package is bundled with the jar 
+</p>
+
+<h4>Documentation</h4>
 <p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">here</a>.</p>
 
+<h4>License</h4>
 <p>Licensed under <a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons</a></p>
