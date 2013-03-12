@@ -102,6 +102,15 @@ mapView.addMarker(anotherView, 42.3665, -71.05224);
   However, that package is bundled with mapviewlib.jar so is only needed if you're using the java files directly in your project.
 </p>
 
+<h4>Maven users</h4>
+```xml
+<dependency>
+	<groupId>com.github.moagrius</groupId>
+	<artifactId>MapView</artifactId>
+	<version>1.0.0</version>
+</dependency>
+```
+
 <h4>Documentation</h4>
 <p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">here</a>.</p>
 
