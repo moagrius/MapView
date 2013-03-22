@@ -9,9 +9,9 @@
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>com.google.android</groupId>
+			<groupId>android</groupId>
 			<artifactId>android</artifactId>
-			<version>4.1.1.4</version>
+			<version>4.2_r1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -20,10 +20,9 @@
 			<version>1.3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>support-v4</artifactId>
-			<version>r7</version>
-			<scope>compile</scope>
+			<groupId>android.support</groupId>
+			<artifactId>compatibility-v4</artifactId>
+			<version>12</version>
 		</dependency>
 		
 	</dependencies>
@@ -36,12 +35,12 @@
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<version>3.5.1</version>
+				<extensions>true</extensions>
 				<configuration>
 					<sdk>
 						<platform>17</platform>
 					</sdk>
 				</configuration>
-				<extensions>true</extensions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
