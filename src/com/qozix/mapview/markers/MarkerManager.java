@@ -1,23 +1,18 @@
 package com.qozix.mapview.markers;
 
 import android.content.Context;
-import android.graphics.Rect;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewParent;
 
 import com.qozix.layouts.TranslationLayout;
-import com.qozix.layouts.AnchorLayout.LayoutParams;
-import com.qozix.mapview.MapView;
 import com.qozix.mapview.viewmanagers.ViewSetManager;
 import com.qozix.mapview.zoom.ZoomListener;
 import com.qozix.mapview.zoom.ZoomManager;
 
 /*
- * Markers with OnClickListeners will consume the touch event, so the mapview will not scroll.
- * Consider using onTouchEvent if you don't want the event consumed.
+ * TODO: need to consolidate positioning logic - works as is, but does too many unnecessary and possibly messy calculations
+ * should work with adding at runtime, in response to user event, sliding, etc. 
  */
+
 
 public class MarkerManager extends TranslationLayout implements ZoomListener {
 
@@ -31,13 +26,13 @@ public class MarkerManager extends TranslationLayout implements ZoomListener {
 	}	
 	
 	public View addMarker( View v, int x, int y ){
-		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, x, y );
+		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, (int) ( x / scale ), (int) ( y / scale ) );
 		addView( v, lp );
 		return v;
 	}
 
 	public View addMarker( View v, int x, int y, float aX, float aY ) {
-		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, x, y, aX, aY );
+		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, (int) ( x / scale ), (int) ( y / scale ), aX, aY );
 		addView( v, lp );
 		return v;
 	}

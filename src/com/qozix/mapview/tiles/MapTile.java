@@ -109,11 +109,13 @@ public class MapTile {
 			return;
 		}
 		String fileName = getFileName();
-		Bitmap cached = cache.getBitmap( fileName );
-		if ( cached != null ) {
-			bitmap = cached;
-			return;
-		}		
+		if ( cache != null ) {
+			Bitmap cached = cache.getBitmap( fileName );
+			if ( cached != null ) {
+				bitmap = cached;
+				return;
+			}	
+		}			
 		AssetManager assets = context.getAssets();
 		try {
 			InputStream input = assets.open( fileName );
@@ -121,7 +123,9 @@ public class MapTile {
 				try {
 					bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
 					hasBitmap = ( bitmap != null );
-					cache.addBitmap( fileName, bitmap );
+					if ( cache != null ) {
+						cache.addBitmap( fileName, bitmap );
+					}					
 				} catch ( OutOfMemoryError oom ) {
 					Log.d( TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage() );
 				} catch ( Exception e ) {

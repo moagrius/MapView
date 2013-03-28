@@ -15,29 +15,39 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	private int mapWidth;
 	private int mapHeight;
 	
-	private int area;
+	private long area;
 
 	private int rowCount;
 	private int columnCount;
 
 	private String pattern;
+	private String downsample;
 
 	private ZoomManager zoomManager;
 
 	public ZoomLevel( ZoomManager zm, int mw, int mh, String p ) {
-		this( zm, mw, mh, p, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
+		this( zm, mw, mh, p, null, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
+	}
+	
+	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, String d ) {
+		this( zm, mw, mh, p, d, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
+	}
+	
+	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, int tw, int th ) {
+		this( zm, mw, mh, p, null, tw, th );
 	}
 
-	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, int tw, int th ) {
+	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, String d, int tw, int th ) {
 		zoomManager = zm;
 		mapWidth = mw;
 		mapHeight = mh;
 		pattern = p;
+		downsample = d;
 		tileWidth = tw;
 		tileHeight = th;
 		rowCount = (int) ( mapHeight / tileHeight );
 		columnCount = (int) ( mapWidth / tileWidth );
-		area = mapWidth * mapHeight;
+		area = (long) ( mapWidth * mapHeight );
 	}
 
 	public LinkedList<MapTile> getIntersections() {
@@ -83,6 +93,10 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	public String getPattern() {
 		return pattern;
 	}
+	
+	public String getDownsample() {
+		return downsample;
+	}
 
 	public int getRowCount() {
 		return rowCount;
@@ -99,13 +113,13 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 		return path;
 	}
 
-	public int getArea() {
+	public long getArea() {
 		return area;
 	}
 
 	@Override
 	public int compareTo( ZoomLevel o ) {
-		return (int) ( getArea() - o.getArea() );
+		return (int) Math.signum( getArea() - o.getArea() );
 	}
 
 	@Override

@@ -20,6 +20,10 @@ public class TranslationLayout extends AnchorLayout {
 		requestLayout();
 	}
 	
+	public double getScale() {
+		return scale;
+	}
+	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 

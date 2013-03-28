@@ -1,3 +1,34 @@
+<p><strong>Update (March 28, 2013):</strong></p>
+<p>Updating to 1.0.1, fixing several bugs, reinstituting undocumented or previously removed features, and adding some experimental stuff.</p>
+
+<p>Fixes:</p>
+<ol>
+  <li>Fixed bug in draw path where start y position was incorrectly reading x position</li>
+  <li>Fixed bug in setZoom where it was maxing to the minimum (this method should work properly now)</li>
+  <li>Fixed bug in geolocation math where the relative scale of the current zoom level was not being considered</li>
+  <li>Fixed bug in all slideTo methods where postInvalidate was not being called</li>
+  <li>Fixed bug where a render request was not issued at the conclusion of a slideTo animation</li>
+  <li>Fixed signature of removeHotSpot</li>
+</ol>
+
+<p>Enhancements:</p>
+<ol>
+  <li>No longer intercepts touch events by default.  This can be enabled with `setShouldIntercept(boolean)`</li>
+  <li>No longer caches tile images by default.  This can be enabled with `setCacheEnabled(boolean)`</li>
+  <li>added `clear` and `destroy` methods.  The former is appropriate for `onPause`, the latter for `onDestroy` (incl. orientation changes)</li>
+  <li>added `resetZoomLevels` to allow different sets to be used during runtime</li>
+  <li>onFlingComplete now passes the x and y value of the final position</li>
+  <li>added onScrollComplete (fires when a slideTo method finishes)</li>
+  <li>exposed lockZoom and unlockZoom methods.  These can be used to prevent a tile set from changing (useful during animated or user-event driven scale changes)</li>
+</ol>
+
+<p>Known issues:</p>
+<ol>
+  <li>The positioning logic has gotten a little crummy.  It works but is a little bloated and distributed across more parties than it should.  I don't think experimental status fits, but it's close.</li>
+</ol>
+
+<p><em>Note that the documentation has not been updated, nor has the jar - will get to those as soon as I get some time</em></p>
+
 <p><strong>Update (March 8, 2013):</strong></p>
 
 <p>While this component is still in beta, the version now available should behave predictably.</p>

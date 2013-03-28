@@ -20,9 +20,9 @@ public class ZoomManager {
 	private double maxScale = 1;
 	private double historicalScale;
 	
-	private double relativeScale;  // at 0.375 actual scale, that's an 0.5 zoom scale and 0.75 relative scale
-	private double invertedScale;  // at 0.375 actual scale, than's an 0.5 zoom scale and 2.375 inverted scale
-	private double computedScale;  // at 0.375 actual scale, that's an 0.5 zoom scale and 0.75 computed scale
+	private double relativeScale;
+	private double invertedScale;
+	private double computedScale;
 	
 	private int zoom;
 	private int lastZoom = -1;
@@ -35,6 +35,8 @@ public class ZoomManager {
 	
 	private int computedCurrentWidth;
 	private int computedCurrentHeight;
+	private int currentScaledWidth;
+	private int currentScaledHeight;
 	
 	private int baseMapWidth;
 	private int baseMapHeight;
@@ -113,6 +115,10 @@ public class ZoomManager {
 			return;
 		}
 		
+		// get references to top and bottom levels
+		highestZoomLevel = zoomLevels.getLast();
+		lowestZoomLevel = zoomLevels.getFirst();
+		
 		// update zoom if unlocked
 		if(!zoomLocked){
 			zoom = computeZoom( scale, numZoomLevels );
@@ -131,13 +137,14 @@ public class ZoomManager {
 		baseMapHeight = currentZoomLevel.getMapHeight();
 		computedCurrentWidth = (int) ( baseMapWidth * invertedScale );
 		computedCurrentHeight = (int) ( baseMapHeight * invertedScale );
+		currentScaledWidth = (int) ( computedCurrentWidth * scale );
+		currentScaledHeight = (int) ( computedCurrentHeight * scale );
 		
 		// broadcast scale change
 		if( changed ) {
 			for ( ZoomListener listener : zoomListeners ) {
 				listener.onZoomScaleChanged( scale );
-			}
-			
+			}			
 		}
 		
 		// if there's a change in zoom, update appropriate values
@@ -162,7 +169,7 @@ public class ZoomManager {
 	public void setZoom( int z ) {
 		int maxZoom = numZoomLevels - 1;
 		z = Math.max(z, 0);
-		z = Math.max(z, maxZoom);
+		z = Math.min(z, maxZoom);
 		double s = 1 / (double) ( 1 << ( maxZoom - z ) );
 		setScale( s );
 	}
@@ -187,21 +194,35 @@ public class ZoomManager {
 		ZoomLevel zoomLevel = new ZoomLevel( this, wide, tall, pattern );
 		registerZoomLevel( zoomLevel );
 	}
+	
+	public void addZoomLevel( int wide, int tall, String pattern, String downsample ) {
+		ZoomLevel zoomLevel = new ZoomLevel( this, wide, tall, pattern, downsample );
+		registerZoomLevel( zoomLevel );
+	}
 
 	public void addZoomLevel( int wide, int tall, String pattern, int tileWidth, int tileHeight ) {
 		ZoomLevel zoomLevel = new ZoomLevel( this, wide, tall, pattern, tileWidth, tileHeight );
 		registerZoomLevel( zoomLevel );
 	}
 	
+	public void addZoomLevel( int wide, int tall, String pattern, String downsample, int tileWidth, int tileHeight ) {
+		ZoomLevel zoomLevel = new ZoomLevel( this, wide, tall, pattern, downsample, tileWidth, tileHeight );
+		registerZoomLevel( zoomLevel );
+	}
+	
 	private void registerZoomLevel( ZoomLevel zoomLevel ) {
 		zoomLevels.addZoomLevel( zoomLevel );
 		numZoomLevels = zoomLevels.size();
-		highestZoomLevel = zoomLevels.getLast();
-		lowestZoomLevel = zoomLevels.getFirst();
 		update( true );
 		for ( ZoomSetupListener listener : zoomSetupListeners ) {
 			listener.onZoomLevelAdded();
 		}
+	}
+	
+	public void resetZoomLevels(){
+		zoomLevels.clear();
+		numZoomLevels = 0;
+		update( true );
 	}
 
 	public ZoomLevel getCurrentZoomLevel() {
@@ -222,6 +243,14 @@ public class ZoomManager {
 	
 	public int getComputedCurrentHeight(){
 		return computedCurrentHeight;
+	}
+	
+	public int getCurrentScaledWidth(){
+		return currentScaledWidth;
+	}
+	
+	public int getCurrentScaledHeight(){
+		return currentScaledHeight;
 	}
 	
 	public int getZoom() {

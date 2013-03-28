@@ -1,5 +1,12 @@
 package com.qozix.mapview;
 
+/*
+ * For desired JavaDoc results, temporarily:
+ * 1. Comment out addChild
+ * 2. Add getScale (just calls super)
+ * 3. Add setScale (just calls super)
+ */
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,6 +15,7 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 
 import com.qozix.geom.Coordinate;
@@ -19,6 +27,9 @@ import com.qozix.mapview.markers.MarkerManager;
 import com.qozix.mapview.paths.PathManager;
 import com.qozix.mapview.tiles.TileManager;
 import com.qozix.mapview.tiles.TileRenderListener;
+import com.qozix.mapview.viewmanagers.DownsampleManager;
+import com.qozix.mapview.viewmanagers.ViewCurator;
+import com.qozix.mapview.zoom.ZoomLevel;
 import com.qozix.mapview.zoom.ZoomListener;
 import com.qozix.mapview.zoom.ZoomManager;
 
@@ -60,6 +71,7 @@ public class MapView extends ZoomPanLayout {
 	
 	private ZoomManager zoomManager = new ZoomManager();
 	private HotSpotManager hotSpotManager = new HotSpotManager();
+	private DownsampleManager downsampleManager = new DownsampleManager();
 	
 	private TileManager tileManager;
 	private MarkerManager markerManager;
@@ -163,8 +175,16 @@ public class MapView extends ZoomPanLayout {
 		tileManager.cancelRender();
 	}
 	
+	/**
+	 * Enables or disables map-tile image caching (in-memory and on-disk)
+	 * @param shouldCache (boolean) true to enable caching, false to disable it (default)
+	 */
+	public void setCacheEnabled( boolean shouldCache ) {
+		tileManager.setCacheEnabled( shouldCache );
+	}
+	
 	//------------------------------------------------------------------------------------
-	// Setup API
+	// Zoom Management API
 	//------------------------------------------------------------------------------------
 	
 	/**
@@ -179,6 +199,21 @@ public class MapView extends ZoomPanLayout {
 	 */
 	public void addZoomLevel( int wide, int tall, String pattern ) {
 		zoomManager.addZoomLevel(wide, tall, pattern );
+	}
+	
+	/**
+	 * Register a tile set to be used for a particular zoom level.
+	 * Each tile set to be used must be registered using this method,
+	 * and at least one zoom level must be registered for the MapView to render any tiles.
+	 * Zoom levels will be ordered from smallest to largest, based on the area (width * height)
+	 * 	 
+	 * @param wide (int) total width of the tile set
+	 * @param tall (int) total height of the tile set
+	 * @param pattern (String) string path to the location of the map tiles (in the assets directory), with %col% and %row% to be replaced by their respective integer positions.  E.g., "folder/tile-%col%-%row%.jpg"
+	 * @param downsample (String) string path to the location of an optional non-tiled image to serve as the background for a ZoomLevel.  It's recommended that this image is low-res and small in size.
+	 */
+	public void addZoomLevel( int wide, int tall, String pattern, String downsample ) {
+		zoomManager.addZoomLevel(wide, tall, pattern, downsample );
 	}
 
 	/**
@@ -195,6 +230,48 @@ public class MapView extends ZoomPanLayout {
 	 */
 	public void addZoomLevel( int wide, int tall, String pattern, int tileWidth, int tileHeight ){
 		zoomManager.addZoomLevel( wide, tall, pattern, tileWidth, tileHeight );
+	}
+	
+	/**
+	 * Register a tile set to be used for a particular zoom level.
+	 * Each tile set to be used must be registered using this method,
+	 * and at least one zoom level must be registered for the MapView to render any tiles.
+	 * Zoom levels will be ordered from smallest to largest, based on the area (width * height)
+	 * 	 
+	 * @param wide (int) total width of the tile set
+	 * @param tall (int) total height of the tile set
+	 * @param pattern (String) string path to the location of the map tiles (in the assets directory), with %col% and %row% to be replaced by their respective integer positions.  E.g., "folder/tile-%col%-%row%.jpg"
+	 * @param downsample (String) string path to the location of an optional non-tiled image to serve as the background for a ZoomLevel.  It's recommended that this image is low-res and small in size.
+	 * @param tileWidth (int) size of each tiled column
+	 * @param tileHeight (int) size of each tiled row
+	 */
+	public void addZoomLevel( int wide, int tall, String pattern, String downsample, int tileWidth, int tileHeight ){
+		zoomManager.addZoomLevel( wide, tall, pattern, downsample, tileWidth, tileHeight );
+	}
+	
+	/**
+	 * Clear all previously registered zoom levels.  This method is experimental.
+	 */
+	public void resetZoomLevels(){
+		zoomManager.resetZoomLevels();
+	}
+	
+	/**
+	 * While zoom is locked (after this method is invoked, and before unlockZoom is invoked),
+	 * the ZoomLevel will not change, and the current ZoomLevel will be scaled beyond the normal
+	 * bounds.  Normally, once a ZoomLevel reach 0.5 or lower scale, the manager searches for the
+	 * next smallest ZoomLevel and activates it, changing the tiles set et al.  While zoom is locked,
+	 * this does not occur
+	 */
+	public void lockZoom(){
+		zoomManager.lockZoom();
+	}
+	
+	/**
+	 * Unlocks a ZoomLevel locked with lockZoom
+	 */
+	public void unlockZoom(){
+		zoomManager.unlockZoom();
 	}
 	
 	//------------------------------------------------------------------------------------
@@ -243,8 +320,8 @@ public class MapView extends ZoomPanLayout {
 		double[] position = new double[2];
 		Point point = new Point( (int) x, (int) y );
 		Coordinate coordinate = geolocator.translate( point );
-		position[0] = coordinate.longitude;
-		position[1] = coordinate.latitude;
+		position[0] = coordinate.latitude;
+		position[1] = coordinate.longitude;
 		return position;
 	}
 	
@@ -654,7 +731,7 @@ public class MapView extends ZoomPanLayout {
 	 * @param listener (View.OnClickListener) the listener that was registered to this hotspot
 	 * @return (boolean) true if a hotspot was removed, false if not
 	 */
-	public void removeCallout( Rect rectangle, View.OnClickListener listener ) {
+	public void removeHotSpot( Rect rectangle, View.OnClickListener listener ) {
 		hotSpotManager.removeHotSpot( rectangle, listener );
 	}
 	
@@ -722,7 +799,27 @@ public class MapView extends ZoomPanLayout {
 		return false;
 	}
 	
-
+	//------------------------------------------------------------------------------------
+	// Memory Management API
+	//------------------------------------------------------------------------------------
+	
+	/**
+	 * Clear bitmap tiles, appropriate for onPause.
+	 * (Currently not clearing downsample - might be worthwhile)
+	 */
+	public void clear() {
+		tileManager.clear();
+	}
+	
+	/**
+	 * Clear bitmap tiles and remove all views, appropriate for onDestroy
+	 * References to MapView should be set to null following invocations of this method.
+	 */
+	public void destroy() {
+		tileManager.clear();
+		ViewCurator.clear( this );
+	}
+	
 	//------------------------------------------------------------------------------------
 	// PRIVATE API
 	//------------------------------------------------------------------------------------
@@ -752,6 +849,13 @@ public class MapView extends ZoomPanLayout {
 		setSize( w, h );
 	}
 	
+	// show downsampled background image for the current zoom level
+	private void updateDownsample() {
+		ZoomLevel zoomLevel = zoomManager.getCurrentZoomLevel();
+		String downsample = zoomLevel.getDownsample();
+		downsampleManager.setDownsample( getClip(), downsample );
+	}
+	
 	// let the zoom manager know what tiles to show based on our position and dimensions
 	private void updateViewport(){
 		int left = getScrollX();
@@ -774,6 +878,9 @@ public class MapView extends ZoomPanLayout {
 			Point p = geolocator.translate( c );
 			x = p.x;
 			y = p.y;
+		} else {
+			x *= getScale();
+			y *= getScale();
 		}
 		position[0] = (int) x;
 		position[1] = (int) y;
@@ -844,6 +951,7 @@ public class MapView extends ZoomPanLayout {
 		@Override
 		public void onZoomLevelChanged( int oldZoom, int currentZoom ) {
 			updateClipFromCurrentZoom();
+			updateDownsample();
 			requestRender();
 			for ( MapEventListener listener : mapEventListeners ) {
 				listener.onZoomLevelChanged( oldZoom, currentZoom );
@@ -900,10 +1008,10 @@ public class MapView extends ZoomPanLayout {
 			}
 		}
 		@Override
-		public void onFlingComplete() {
+		public void onFlingComplete( Point point ) {
 			requestRender();
 			for ( MapEventListener listener : mapEventListeners ) {
-				listener.onFlingComplete();
+				listener.onFlingComplete( point.x, point.y );
 			}
 		}
 		@Override
@@ -935,6 +1043,13 @@ public class MapView extends ZoomPanLayout {
 			hotSpotManager.processHit( scaledPoint );
 			for ( MapEventListener listener : mapEventListeners ) {
 				listener.onTap( point.x, point.y );
+			}
+		}
+		@Override
+		public void onScrollComplete( Point point ) {
+			requestRender();
+			for ( MapEventListener listener : mapEventListeners ) {
+				listener.onScrollChanged( point.x, point.y );
 			}
 		}
 	};
@@ -1021,8 +1136,10 @@ public class MapView extends ZoomPanLayout {
 		public void onFling( int sx, int sy, int dx, int dy );
 		/**
 		 * Fires when a fling action has completed
+		 * @param x (int) the final x scroll position of the MapView after the fling
+		 * @param y (int) the final y scroll position of the MapView after the fling
 		 */
-		public void onFlingComplete();
+		public void onFlingComplete( int x, int y );
 		/**
 		 * Fires when the MapView's scale has updated
 		 * @param scale (double) the new scale of the MapView (0-1)

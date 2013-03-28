@@ -1,11 +1,13 @@
 package com.qozix.layouts;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -71,6 +73,10 @@ public class ZoomPanLayout extends ViewGroup {
 	private boolean isBeingFlung = false;
 	
 	private long lastTouchedAt;
+	
+	private boolean shouldIntercept = false;
+	
+	private ScrollActionHandler scrollActionHandler;
 
 	private Scroller scroller;
 	private VelocityTracker velocity;
@@ -118,6 +124,8 @@ public class ZoomPanLayout extends ViewGroup {
 
 		super( context );
 		setWillNotDraw( false );
+		
+		scrollActionHandler = new ScrollActionHandler( this );
 
 		scroller = new Scroller( context );
 		scroller.setFriction( FRICTION );
@@ -160,6 +168,10 @@ public class ZoomPanLayout extends ViewGroup {
 		}
 		maxScale = max;
 		setScale( scale );
+	}
+	
+	public void setShouldIntercept( boolean intercept ){
+		shouldIntercept = intercept;
 	}
 
 	private void calculateMinimumScaleToFit() {
@@ -229,6 +241,10 @@ public class ZoomPanLayout extends ViewGroup {
 	public boolean isFlinging(){
 		return isBeingFlung;
 	}
+	
+	protected View getClip() {
+		return clip;
+	}
 
 	private void updateClip() {
 		updateViewClip( clip );
@@ -267,31 +283,32 @@ public class ZoomPanLayout extends ViewGroup {
 		if ( scroller.computeScrollOffset() ) {
 			Point destination = new Point( scroller.getCurrX(), scroller.getCurrY() );
 			scrollToPoint( destination );
-			if ( isBeingFlung ) {
-				dispatchFlingNotification();
-			}
+			postInvalidate();  // should not be necessary but is...
+			dispatchScrollActionNotification();
 		}
 	}
 	
-	private void dispatchFlingNotification(){
-		if ( flingHandler.hasMessages( 0 )) {
-			flingHandler.removeMessages( 0 );
+	private void dispatchScrollActionNotification(){
+		if ( scrollActionHandler.hasMessages( 0 )) {
+			scrollActionHandler.removeMessages( 0 );
 		}
-		flingHandler.sendEmptyMessageDelayed( 0, 100 );
+		scrollActionHandler.sendEmptyMessageDelayed( 0, 100 );
 	}
 	
-	private Handler flingHandler = new Handler(){
-		@Override
-		public void handleMessage(final Message message) {
+	private void handleScrollerAction() {
+		Point point = new Point();
+		point.x = getScrollX();
+		point.y = getScrollY();
+		for( GestureListener listener : gestureListeners ) {
+			listener.onScrollComplete( point );
+		}
+		if ( isBeingFlung ) {
 			isBeingFlung = false;
-			Point point = new Point();
-			point.x = getScrollX();
-			point.y = getScrollY();
 			for( GestureListener listener : gestureListeners ) {
-				listener.onFlingComplete();
+				listener.onFlingComplete( point );
 			}
-		}
-	};
+		}		
+	}
 
 	private void constrainPoint( Point point ) {
 		int x = point.x;
@@ -311,13 +328,10 @@ public class ZoomPanLayout extends ViewGroup {
 		int ny = (int) point.y;
 		scrollTo( nx, ny );
 		if ( ox != nx || oy != ny ) {
-			
 			for ( ZoomPanListener listener : zoomPanListeners ) {
 				listener.onScrollChanged( nx, ny );
 				listener.onZoomPanEvent();
 			}
-			//Log.d( TAG, scroller.getCurrX() + ":" + scroller.getCurrY() + "," + scroller.getFinalX() + ":" + scroller.getFinalY() );
-			//Log.d( TAG, "scroller.isFinished=" + scroller.isFinished() + ", scroller.cso=" + scroller.computeScrollOffset());
 		}
 	}
 
@@ -544,14 +558,17 @@ public class ZoomPanLayout extends ViewGroup {
 	public boolean onInterceptTouchEvent (MotionEvent event) {
 		// update positions
 		processEvent( event);
-		// get the type of action
-		final int action = event.getAction() & MotionEvent.ACTION_MASK;		
-		// if it's a move event...
-		if ( action == MotionEvent.ACTION_MOVE ) {			
-			// and capture it (so touch listeners on the children don't consume it and prevent scrolling)
-			return true;
-		}
-		// otherwise, let the child handle it
+		// if we wan't to intercept events (and allow drag on children)...
+		if ( shouldIntercept ) {
+			// get the type of action
+			final int action = event.getAction() & MotionEvent.ACTION_MASK;		
+			// if it's a move event...
+			if ( action == MotionEvent.ACTION_MOVE ) {			
+				// and capture it (so touch listeners on the children don't consume it and prevent scrolling)
+				return true;
+			}
+			// otherwise, let the child handle it
+		}		
 		return false;
 	}
 
@@ -666,6 +683,21 @@ public class ZoomPanLayout extends ViewGroup {
 		return true;
 		
 	}
+	
+	private static class ScrollActionHandler extends Handler {
+		private final WeakReference<ZoomPanLayout> reference;
+		public ScrollActionHandler( ZoomPanLayout zoomPanLayout ) {
+			super();
+			reference = new WeakReference<ZoomPanLayout>( zoomPanLayout );
+		}
+		@Override
+		public void handleMessage( Message msg ) {
+			ZoomPanLayout zoomPanLayout = reference.get();
+			if ( zoomPanLayout != null ) {
+				zoomPanLayout.handleScrollerAction();
+			}
+		}
+	}
 
 	public static interface ZoomPanListener {
 		public void onScaleChanged( double scale );
@@ -677,6 +709,7 @@ public class ZoomPanLayout extends ViewGroup {
 
 	public static interface GestureListener {
 		public void onFingerDown( Point point );
+		public void onScrollComplete( Point point );
 		public void onFingerUp( Point point );
 		public void onDrag( Point point );
 		public void onDoubleTap( Point point );
@@ -685,7 +718,7 @@ public class ZoomPanLayout extends ViewGroup {
 		public void onPinchStart( Point point );
 		public void onPinchComplete( Point point );
 		public void onFling( Point startPoint, Point finalPoint );
-		public void onFlingComplete();
+		public void onFlingComplete( Point point );
 	}
 
 }

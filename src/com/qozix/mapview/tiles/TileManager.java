@@ -26,13 +26,13 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 	private LinkedList<MapTile> scheduledToRender = new LinkedList<MapTile>();
 	private LinkedList<MapTile> alreadyRendered = new LinkedList<MapTile>();
 
-	private HashMap<Integer, ScalingLayout> tileGroups = new HashMap<Integer, ScalingLayout>();
+	private HashMap<Integer, ScalingLayout> tileGroups = new HashMap<Integer, ScalingLayout>();  // ignore this lint - HashMap is preferred here.
 
 	private TileRenderListener renderListener;
 	
 	private MapTileCache cache;
 	private ZoomLevel zoomLevelToRender;
-	private RenderTask lastRunRenderTask;
+	private TileRenderTask lastRunRenderTask;
 	private ScalingLayout currentTileGroup;
 	private ZoomManager zoomManager;
 
@@ -41,12 +41,27 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 	private boolean renderIsCancelled = false;
 	private boolean renderIsSuppressed = false;
 	private boolean isRendering = false;
+	
+	private TileRenderHandler handler;
 
 	public TileManager( Context context, ZoomManager zm ) {
 		super( context );
 		zoomManager = zm;
-		zoomManager.addZoomListener( this );
-		cache = new MapTileCache( context );
+		zoomManager.addZoomListener( this );		
+		handler = new TileRenderHandler( this );
+	}
+	
+	public void setCacheEnabled( boolean shouldCache ) {
+		if ( shouldCache ){
+			if ( cache == null ){
+				cache = new MapTileCache( getContext() );
+			}
+		} else {
+			if ( cache != null ) {
+				cache.destroy();
+			}
+			cache = null;
+		}
 	}
 	
 	public void setTileRenderListener( TileRenderListener listener ){
@@ -122,6 +137,37 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 	public boolean getIsRendering() {
 		return isRendering;
 	}
+	
+	public void clear() {
+		// suppress and cancel renders
+		suppressRender();
+		cancelRender();		
+		// destroy all tiles
+		for ( MapTile m : scheduledToRender ) {
+			m.destroy();
+		}
+		scheduledToRender.clear();
+		for ( MapTile m : alreadyRendered ) {
+			m.destroy();
+		}
+		alreadyRendered.clear();
+		// the above should clear everything, but let's be redundant
+		for ( ScalingLayout tileGroup : tileGroups.values() ) {
+			int totalChildren = tileGroup.getChildCount();
+			for ( int i = 0; i < totalChildren; i++ ) {
+				View child = tileGroup.getChildAt( i );
+				if ( child instanceof ImageView ) {
+					ImageView imageView = (ImageView) child;
+					imageView.setImageBitmap( null );
+				}
+			}
+			tileGroup.removeAllViews();
+		}
+		// clear the cache
+		if ( cache != null ) {
+			cache.clear();
+		}
+	}
 
 	private ScalingLayout getCurrentTileGroup() {
 		int zoom = zoomManager.getZoom();
@@ -136,20 +182,10 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 		return tileGroup;
 	}
 
-	private Handler handler = new Handler() {
-		@Override
-		public void handleMessage( final Message message ) {
-			// leave the switch even though there's only a single case
-			// for now do cleanup on UI thread
-			switch ( message.what ) {
-			case RENDER_FLAG :
-				renderTiles();
-				break;
-			}
-		}
-	};
+	
 
-	private void renderTiles() {
+	// access omitted deliberately - need package level access for the TileRenderHandler
+	void renderTiles() {
 		// has it been canceled since it was requested?
 		if ( renderIsCancelled ) {
 			return;
@@ -189,19 +225,8 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 			}
 		}
 		// start a new one
-		lastRunRenderTask = new RenderTask();
+		lastRunRenderTask = new TileRenderTask( this );
 		lastRunRenderTask.execute();
-	}
-
-	private void renderIndividualTile( MapTile m ) {
-		if ( alreadyRendered.contains( m ) ) {
-			return;
-		}
-		m.render( getContext() );
-		alreadyRendered.add( m );
-		ImageView i = m.getImageView();
-		LayoutParams l = getLayoutFromTile( m );
-		currentTileGroup.addView( i, l );
 	}
 
 	private FixedLayout.LayoutParams getLayoutFromTile( MapTile m ) {
@@ -231,80 +256,62 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 		}
 	}
 
-	private class RenderTask extends AsyncTask<Void, MapTile, Void> {
-
-		@Override
-		protected void onPreExecute() {
-			// set a flag that we're working
-			isRendering = true;
-			// notify anybody interested
-			if ( renderListener != null ) {
-				renderListener.onRenderStart();
-			}
+	/*
+	 *  render tasks (invoked in asynctask's thread)
+	 */
+	
+	void onRenderTaskPreExecute(){
+		// set a flag that we're working
+		isRendering = true;
+		// notify anybody interested
+		if ( renderListener != null ) {
+			renderListener.onRenderStart();
 		}
-
-		@Override
-		protected Void doInBackground( Void... params ) {
-			// avoid concurrent modification exceptions by duplicating
-			LinkedList<MapTile> renderList = new LinkedList<MapTile>( scheduledToRender );
-			// start rendering, checking each iteration if we need to break out
-			for ( MapTile m : renderList ) {
-				// quit if we've been forcibly stopped
-				if ( renderIsCancelled ) {
-					return null;
-				}
-				// quit if task has been cancelled or replaced
-				if ( isCancelled() ) {
-					return null;
-				}
-				// once the bitmap is decoded, the heavy lift is done
-				m.decode( getContext(), cache );
-				// pass it to the UI thread for insertion into the view tree
-				publishProgress( m );
-			}
-			return null;
+	}
+	
+	void onRenderTaskCancelled() {
+		if ( renderListener != null ) {
+			renderListener.onRenderCancelled();
 		}
-
-		@Override
-		protected void onProgressUpdate( MapTile... params ) {
-			// quit if it's been force-stopped
-			if ( renderIsCancelled ) {
-				return;
-			}
-			// quit if it's been stopped or replaced by a new task
-			if ( isCancelled() ) {
-				return;
-			}
-			// tile should already have bitmap decoded
-			MapTile m = params[0];
-			// add the bitmap to it's view, add the view to the current zoom layout
-			renderIndividualTile( m );
+		isRendering = false;
+	}
+	
+	void onRenderTaskPostExecute() {
+		// set flag that we're done
+		isRendering = false;
+		// everything's been rendered, so get rid of the old tiles
+		cleanup();
+		// recurse - request another round of render - if the same intersections are discovered, recursion will end anyways
+		requestRender();
+		// notify anybody interested
+		if ( renderListener != null ) {
+			renderListener.onRenderComplete();
 		}
+	}
+	
+	LinkedList<MapTile> getRenderList(){
+		return new LinkedList<MapTile>( scheduledToRender );
+	}
+	
+	void decodeIndividualTile( MapTile m ) {
+		m.decode( getContext(), cache );
+	}
 
-		@Override
-		protected void onPostExecute( Void param ) {
-			// set flag that we're done
-			isRendering = false;
-			// everything's been rendered, so get rid of the old tiles
-			cleanup();
-			// recurse - request another round of render - if the same intersections are discovered, recursion will end anyways
-			requestRender();
-			// notify anybody interested
-			if ( renderListener != null ) {
-				renderListener.onRenderComplete();
-			}
+	void renderIndividualTile( MapTile m ) {
+		if ( alreadyRendered.contains( m ) ) {
+			return;
 		}
-
-		@Override
-		protected void onCancelled() {
-			if ( renderListener != null ) {
-				renderListener.onRenderCancelled();
-			}
-			isRendering = false;
-		}
-
-	};
-
+		m.render( getContext() );
+		alreadyRendered.add( m );
+		ImageView i = m.getImageView();
+		LayoutParams l = getLayoutFromTile( m );
+		currentTileGroup.addView( i, l );
+	}
+	
+	boolean getRenderIsCancelled() {
+		return renderIsCancelled;
+	}
+	
 	@Override
 	public void onZoomLevelChanged( int oldZoom, int newZoom ) {
 		updateTileSet();

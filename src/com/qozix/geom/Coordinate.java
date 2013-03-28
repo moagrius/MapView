@@ -13,7 +13,7 @@ public class Coordinate {
 	}
 
 	public Coordinate( Coordinate src ) {
-		set( src.longitude, src.latitude );
+		set( src.latitude, src.longitude );
 	}
 
 	public void set( double lat, double lng ) {

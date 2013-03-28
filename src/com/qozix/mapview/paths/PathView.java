@@ -54,6 +54,10 @@ public class PathView extends View {
 	public double getScale() {
 		return scale;
 	}
+	
+	public Paint getPaint(){
+		return paint;
+	}
 
 	public void setScale( double s ) {
 		float factor = (float) s;
@@ -68,7 +72,7 @@ public class PathView extends View {
 	public void drawPath( List<Point> points ) {
 		Point start = points.get( 0 );
 		originalPath.reset();
-		originalPath.moveTo( (float) start.x, (float) start.x );
+		originalPath.moveTo( (float) start.x, (float) start.y );
 		int l = points.size();
 		for ( int i = 1; i < l; i++ ) {
 			Point p = points.get( i );

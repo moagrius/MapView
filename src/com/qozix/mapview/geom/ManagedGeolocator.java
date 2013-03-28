@@ -1,5 +1,7 @@
 package com.qozix.mapview.geom;
 
+import android.util.Log;
+
 import com.qozix.geom.Geolocator;
 import com.qozix.mapview.zoom.ZoomListener;
 import com.qozix.mapview.zoom.ZoomManager;
@@ -15,8 +17,9 @@ public class ManagedGeolocator extends Geolocator implements ZoomListener {
 	}
 	
 	private void update(){
-		int w = zoomManager.getComputedCurrentWidth();
-		int h = zoomManager.getComputedCurrentHeight();
+		int w = zoomManager.getCurrentScaledWidth();
+		int h = zoomManager.getCurrentScaledHeight();
+		Log.d( "ManagedGeolocator", w + ":" + h);
 		setSize( w, h );
 	}
 	

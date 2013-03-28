@@ -81,6 +81,36 @@ public class MapTileCache {
 		return bitmap;
 	}
 	
+	public void destroy(){
+		memoryCache.evictAll();
+		memoryCache = null;
+		new Thread(new Runnable(){
+			@Override
+			public void run(){
+				try {
+					diskCache.delete();
+					diskCache = null;
+				} catch ( IOException e ) {
+					
+				}
+			}
+		});		
+	}
+	
+	public void clear() {
+		memoryCache.evictAll();
+		new Thread(new Runnable(){
+			@Override
+			public void run(){
+				try {
+					diskCache.delete();
+				} catch ( IOException e ) {
+					
+				}
+			}
+		});		
+	}
+	
 	private void addBitmapToMemoryCache( String key, Bitmap bitmap ) {
 		if ( getBitmapFromMemoryCache( key ) == null ) {
 			memoryCache.put( key, bitmap );
