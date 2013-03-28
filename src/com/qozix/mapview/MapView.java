@@ -1,12 +1,5 @@
 package com.qozix.mapview;
 
-/*
- * For desired JavaDoc results, temporarily:
- * 1. Comment out addChild
- * 2. Add getScale (just calls super)
- * 3. Add setScale (just calls super)
- */
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
