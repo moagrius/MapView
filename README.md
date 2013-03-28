@@ -13,6 +13,7 @@
 
 <p>Enhancements:</p>
 <ol>
+  <li>Reinstated support for downsamples images.  See MapView.java for new signatures</li>
   <li>No longer intercepts touch events by default.  This can be enabled with `setShouldIntercept(boolean)`</li>
   <li>No longer caches tile images by default.  This can be enabled with `setCacheEnabled(boolean)`</li>
   <li>added `clear` and `destroy` methods.  The former is appropriate for `onPause`, the latter for `onDestroy` (incl. orientation changes)</li>
