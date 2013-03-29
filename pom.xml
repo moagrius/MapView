@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.moagrius</groupId>
 	<artifactId>MapView</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
@@ -40,7 +40,27 @@
 					<sdk>
 						<platform>17</platform>
 					</sdk>
+					<lint>
+					    <failOnError>false</failOnError>
+					    <skip>false</skip>
+					    <ignoreWarnings>false</ignoreWarnings>
+					    <warnAll>true</warnAll>
+					    <warningsAsErrors>false</warningsAsErrors>
+					    <enableHtml>true</enableHtml>
+					    <htmlOutputPath>${project.build.directory}/lint-results</htmlOutputPath>
+					    <enableXml>true</enableXml>
+					    <xmlOutputPath>${project.build.directory}/lint-results/lint-results.xml</xmlOutputPath>
+					</lint>
 				</configuration>
+				<executions>
+					<execution>
+	                    <id>lint</id>
+	                    <goals>
+	                        <goal>lint</goal>
+	                    </goals>
+	                    <phase>install</phase>
+                	</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
