@@ -22,7 +22,7 @@ public class DownsampleManager {
 	// NFI why this is required - caused by if ( fileName == null )
 	@SuppressWarnings("unused")
 	public void setDownsample( View view, String fileName ) {		
-		if ( fileName.equals( lastFileName )) {
+		if ( fileName != null && fileName.equals( lastFileName )) {
 			return;
 		}		
 		lastFileName = fileName;
