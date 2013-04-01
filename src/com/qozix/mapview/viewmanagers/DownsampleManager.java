@@ -22,6 +22,7 @@ public class DownsampleManager {
 	public void setDownsample( View view, String fileName ) {		
 		if ( fileName == null ) {
 			view.setBackgroundDrawable( null );
+			lastFileName = null;
 			return;
 		}
 		if ( fileName.equals( lastFileName )) {
