@@ -1,6 +1,10 @@
 package com.qozix.mapview.viewmanagers;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -9,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.View;
+import com.qozix.mapview.tiles.MapTileCache;
 
 public class DownsampleManager {
 
@@ -30,9 +35,14 @@ public class DownsampleManager {
 		}		
 		lastFileName = fileName;
 		Context context = view.getContext();
-		AssetManager assets = context.getAssets();
+
+        InputStream input = null;
 		try {
-			InputStream input = assets.open( fileName );
+			if(fileName.startsWith("http")) {
+                input = loadBitmapFromHttp(context, fileName);
+            } else {
+                input = loadBitmapFromAssetManager(context, fileName);
+            }
 			if ( input != null ) {
 				try {
 					Bitmap bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
@@ -44,6 +54,26 @@ public class DownsampleManager {
 			}
 		} catch (Exception e ) {
 			
-		}
-	}
+		} finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    //igonore
+                }
+            }
+        }
+    }
+
+    private InputStream loadBitmapFromAssetManager(Context context, String fileName) throws IOException {
+        AssetManager assets = context.getAssets();
+        return assets.open( fileName );
+    }
+
+    private InputStream loadBitmapFromHttp(Context context, String fileName) throws IOException {
+        URL url = new URL(fileName);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        return connection.getInputStream();
+
+    }
 }
