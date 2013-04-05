@@ -3,8 +3,6 @@ package com.qozix.mapview.tiles;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import android.content.Context;
@@ -20,7 +18,7 @@ public class MapTile {
 
 	private static final String TAG = MapTile.class.getSimpleName();
 
-	protected static final BitmapFactory.Options OPTIONS = new BitmapFactory.Options();
+	private static final BitmapFactory.Options OPTIONS = new BitmapFactory.Options();
 	static {
 		OPTIONS.inPreferredConfig = Bitmap.Config.RGB_565;
 	}
@@ -39,9 +37,9 @@ public class MapTile {
 	private String pattern;
 
 	private ImageView imageView;
-	protected Bitmap bitmap;
+	private Bitmap bitmap;
 
-	protected boolean hasBitmap;
+	private boolean hasBitmap;
 
 	public MapTile() {
 
