@@ -53,6 +53,8 @@ import com.qozix.mapview.zoom.ZoomManager;
  * mapView.addMarker(someView, 42.35848, -71.063736);
  * mapView.addMarker(anotherView, 42.3665, -71.05224);
  * }</pre>
+ *
+ * <p>When the file pattern provides a protocol like "http://localhost" than the tiles are loaded from the provided server source.</p>
  * 
  * <p>Licensed under <a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons</a></p>
  */
