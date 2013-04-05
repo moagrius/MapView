@@ -2,6 +2,8 @@ package com.qozix.mapview.tiles;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -115,32 +117,56 @@ public class MapTile {
 				bitmap = cached;
 				return;
 			}	
-		}			
-		AssetManager assets = context.getAssets();
-		try {
-			InputStream input = assets.open( fileName );
-			if ( input != null ) {
-				try {
-					bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
-					hasBitmap = ( bitmap != null );
-					if ( cache != null ) {
-						cache.addBitmap( fileName, bitmap );
-					}					
-				} catch ( OutOfMemoryError oom ) {
-					Log.d( TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage() );
-				} catch ( Exception e ) {
-					Log.d( TAG, "unknown error decoding bitmap: " + e.getMessage() );
-				}
-			}
-		} catch ( IOException io ) {
-			Log.d( TAG, "io error - probably can't find the file: " + io.getMessage() );
-		} catch ( Exception e ) {
-			Log.d( TAG, "unknown error opening the asset: " + e.getMessage() );
 		}
 
+        InputStream input = null;
+        try {
+            //if the filename starts with http try to load them from http
+            if(fileName.startsWith("http")) {
+                input = loadBitmapFromHttp(context, cache, fileName);
+            } else {
+                input = loadBitmapFromAssets(context, cache, fileName);
+            }
+            if (input != null) {
+                try {
+                    bitmap = BitmapFactory.decodeStream(input, null, OPTIONS);
+                    hasBitmap = (bitmap != null);
+                    if (cache != null) {
+                        cache.addBitmap(fileName, bitmap);
+                    }
+                } catch (OutOfMemoryError oom) {
+                    Log.d(TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage());
+                } catch (Exception e) {
+                    Log.d(TAG, "unknown error decoding bitmap: " + e.getMessage());
+                }
+            }
+        } catch ( IOException io ) {
+            Log.d( TAG, "io error - probably can't find the file: " + io.getMessage() );
+        } catch ( Exception e ) {
+            Log.d( TAG, "unknown error opening the asset: " + e.getMessage() );
+        } finally {
+            if(input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+        }
 	}
 
-	public boolean render( Context context ) {
+    private InputStream loadBitmapFromAssets(Context context, MapTileCache cache, String fileName) throws IOException {
+        AssetManager assets = context.getAssets();
+        return assets.open(fileName);
+    }
+
+    private InputStream loadBitmapFromHttp(Context context, MapTileCache cache, String fileName) throws IOException {
+        URL url = new URL(fileName);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        return connection.getInputStream();
+    }
+
+    public boolean render( Context context ) {
 		if ( imageView == null ) {
 			imageView = new ImageView( context );
 			imageView.setAdjustViewBounds( false );
