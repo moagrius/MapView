@@ -119,31 +119,25 @@ public class MapTile {
 			}	
 		}
 
-        //if the filename starts with http try to load them from http
-        if(fileName.startsWith("http")) {
-            loadBitmapFromHttp(context, cache, fileName);
-        } else {
-            loadBitmapFromAssets(context, cache, fileName);
-        }
-
-	}
-
-    private void loadBitmapFromAssets(Context context, MapTileCache cache, String fileName) {
-        AssetManager assets = context.getAssets();
         InputStream input = null;
         try {
-             input = assets.open(fileName);
-            if ( input != null ) {
+            //if the filename starts with http try to load them from http
+            if(fileName.startsWith("http")) {
+                input = loadBitmapFromHttp(context, cache, fileName);
+            } else {
+                input = loadBitmapFromAssets(context, cache, fileName);
+            }
+            if (input != null) {
                 try {
                     bitmap = BitmapFactory.decodeStream(input, null, OPTIONS);
-                    hasBitmap = ( bitmap != null );
-                    if ( cache != null ) {
-                        cache.addBitmap( fileName, bitmap );
+                    hasBitmap = (bitmap != null);
+                    if (cache != null) {
+                        cache.addBitmap(fileName, bitmap);
                     }
-                } catch ( OutOfMemoryError oom ) {
+                } catch (OutOfMemoryError oom) {
                     Log.d(TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage());
-                } catch ( Exception e ) {
-                    Log.d( TAG, "unknown error decoding bitmap: " + e.getMessage() );
+                } catch (Exception e) {
+                    Log.d(TAG, "unknown error decoding bitmap: " + e.getMessage());
                 }
             }
         } catch ( IOException io ) {
@@ -159,44 +153,17 @@ public class MapTile {
                 }
             }
         }
+	}
+
+    private InputStream loadBitmapFromAssets(Context context, MapTileCache cache, String fileName) throws IOException {
+        AssetManager assets = context.getAssets();
+        return assets.open(fileName);
     }
 
-    private void loadBitmapFromHttp(Context context, MapTileCache cache, String fileName) {
-        InputStream input = null;
-        HttpURLConnection connection = null;
-        try {
-            URL url = new URL(fileName);
-            connection = (HttpURLConnection) url.openConnection();
-            input = connection.getInputStream();
-            if (input != null) {
-                try {
-                    bitmap = BitmapFactory.decodeStream(input, null, OPTIONS);
-                    hasBitmap = (bitmap != null);
-                    if (cache != null) {
-                        cache.addBitmap(fileName, bitmap);
-                    }
-                } catch (OutOfMemoryError oom) {
-                    Log.d(TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage());
-                } catch (Exception e) {
-                    Log.d(TAG, "unknown error decoding bitmap: " + e.getMessage());
-                }
-            }
-        } catch (IOException io) {
-            Log.d(TAG, "io error - probably can't download the file: " + fileName + " " + io.getMessage());
-        } catch (Exception e) {
-            Log.d(TAG, "unknown error opening the asset: " + e.getMessage());
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    //igonre
-                }
-            }
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+    private InputStream loadBitmapFromHttp(Context context, MapTileCache cache, String fileName) throws IOException {
+        URL url = new URL(fileName);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        return connection.getInputStream();
     }
 
     public boolean render( Context context ) {
