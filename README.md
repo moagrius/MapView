@@ -1,7 +1,8 @@
 <p><strong>Update (April 20, 2013):</strong></p>
 <p>
     Updating to 1.0.2, fixing a couple bugs, adding support for custom Bitmap decoders, improved intersection calculation
-    (thanks to <a target="_blank" href="https://github.com/frankowskid">frankowskid</a>), and some standardization.
+    (thanks to <a target="_blank" href="https://github.com/frankowskid">frankowskid</a>), and some standardization.  Also added
+    the source for a <a target="_blank" href="https://github.com/moagrius/MapViewDemo">sample app</a> and <a href="http://moagrius.github.io/MapView/MapViewDemo.apk">a working .apk</a>
 </p>
 <p>Changes:</p>
 <ol>
@@ -134,6 +135,12 @@ mapView.addMarker(anotherView, 42.3665, -71.05224);
   The widget is straight java, so you can just use the .java files found here (with the dependencies mentioned below), or you can download
   <a href="http://moagrius.github.com/MapView/mapviewlib.jar">the jar</a>.
   Simple instructions are available <a target="_blank" href="http://moagrius.github.com/MapView/installation.html">here</a>.
+</p>
+
+<h4>Example</h4>
+<p>
+  The source for a working app using the MapView is <a target="_blank" href="https://github.com/moagrius/MapViewDemo">here.</a>
+  The compiled .apk for that demo is <a href="http://moagrius.github.io/MapView/MapViewDemo.apk">here.</a>
 </p>
 
 <h4>Dependencies</h4>
