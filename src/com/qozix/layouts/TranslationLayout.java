@@ -3,8 +3,16 @@ package com.qozix.layouts;
 import android.content.Context;
 import android.view.View;
 
-/*
- * considers scale for positioning only (not rendering), and allows anchors for individual children (or default anchor offsets)
+/**
+ * The TranslationLayout extends {@link AnhorLayout}, but additionally supports
+ * a scale value.  The views of this layout will not be scaled along width or height,
+ * but their positions will be multiplied by the TranslationLayout's scale value.
+ * This allows the contained views to maintain their visual appearance and distance
+ * relative to each other, while the total area of the group can be managed by the
+ * scale value.
+ * 
+ * This is useful for positioning groups of markers, tooltips, or indicator views
+ * without scaling, while the reference element(s) are scaled.
  */
 
 public class TranslationLayout extends AnchorLayout {
@@ -15,11 +23,19 @@ public class TranslationLayout extends AnchorLayout {
 		super(context);
 	}
 	
+	/**
+	 * Sets the scale (0-1) of the ZoomPanLayout
+	 * @param scale (double) The new value of the ZoomPanLayout scale
+	 */
 	public void setScale(double d){
 		scale = d;
 		requestLayout();
 	}
 	
+	/**
+	 * Retrieves the current scale of the ZoomPanLayout
+	 * @return (double) the current scale of the ZoomPanLayout
+	 */
 	public double getScale() {
 		return scale;
 	}
@@ -38,8 +54,8 @@ public class TranslationLayout extends AnchorLayout {
 			if (child.getVisibility() != GONE) {
 				TranslationLayout.LayoutParams lp = (TranslationLayout.LayoutParams) child.getLayoutParams();
 				// get anchor offsets
-				float aX = (lp.aX == null) ? anchorX : lp.aX;
-	            float aY = (lp.aY == null) ? anchorY : lp.aY;
+				float aX = (lp.anchorX == null) ? anchorX : lp.anchorX;
+	            float aY = (lp.anchorY == null) ? anchorY : lp.anchorY;
 	            // offset dimensions by anchor values
 	            int computedWidth = (int) (child.getMeasuredWidth() * aX);
 	            int computedHeight = (int) (child.getMeasuredHeight() * aY);
@@ -77,11 +93,11 @@ public class TranslationLayout extends AnchorLayout {
 	            int scaledX = (int) (0.5 + (lp.x * scale));
 	            int scaledY = (int) (0.5 + (lp.y * scale));
 	            // user child's layout params anchor position if set, otherwise default to anchor position of layout
-	            float aX = (lp.aX == null) ? anchorX : lp.aX;
-	            float aY = (lp.aY == null) ? anchorY : lp.aY;
+	            float aX = (lp.anchorX == null) ? anchorX : lp.anchorX;
+	            float aY = (lp.anchorY == null) ? anchorY : lp.anchorY;
 	            // apply anchor offset to position
-	            int x = scaledX - (int) (w * aX);
-	            int y = scaledY - (int) (h * aY);
+	            int x = scaledX + (int) (w * aX);
+	            int y = scaledY + (int) (h * aY);
 	            // set it
 	            child.layout(x, y, x + w, y + h);
 	        }

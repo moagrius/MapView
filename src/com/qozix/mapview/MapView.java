@@ -18,6 +18,7 @@ import com.qozix.mapview.hotspots.HotSpotManager;
 import com.qozix.mapview.markers.CalloutManager;
 import com.qozix.mapview.markers.MarkerManager;
 import com.qozix.mapview.paths.PathManager;
+import com.qozix.mapview.tiles.MapTileDecoder;
 import com.qozix.mapview.tiles.TileManager;
 import com.qozix.mapview.tiles.TileRenderListener;
 import com.qozix.mapview.viewmanagers.DownsampleManager;
@@ -174,6 +175,17 @@ public class MapView extends ZoomPanLayout {
 	 */
 	public void setCacheEnabled( boolean shouldCache ) {
 		tileManager.setCacheEnabled( shouldCache );
+	}
+	
+	/**
+	 * Sets a custom class to perform the decode operation when tile bitmaps are requested.
+	 * By default, a MapTileDecoder implementation is provided that renders bitmaps from the context's Assets,
+	 * but alternative implementations could be used that fetch images via HTTP, or from the SD card, or resources, SVG, etc.
+	 * {@link MapTileDecoderHttp} is an example of such an implementation.
+	 * @param decoder (MapTileDecoder) A class instance that implements MapTileDecoder, and must define a decode method, which accepts a String file name and a Context object, and returns a Bitmap
+	 */
+	public void setTileDecoder( MapTileDecoder decoder ) {
+		tileManager.setDecoder( decoder );
 	}
 	
 	//------------------------------------------------------------------------------------
@@ -871,9 +883,6 @@ public class MapView extends ZoomPanLayout {
 			Point p = geolocator.translate( c );
 			x = p.x;
 			y = p.y;
-		} else {
-			x *= getScale();
-			y *= getScale();
 		}
 		position[0] = (int) x;
 		position[1] = (int) y;
@@ -1070,6 +1079,10 @@ public class MapView extends ZoomPanLayout {
 	// Public static interfaces and classes
 	//------------------------------------------------------------------------------------
 	
+	/**
+	 * Interface for implementations to recieve MapView events.  This interface consolidates several disparate
+	 * listeners (Gestures, ZoomPan Events, MapView events) into a single unit for ease of use.
+	 */
 	public static interface MapEventListener {
 		/**
 		 * Fires when a ACTION_DOWN event is raised from the MapView
@@ -1170,6 +1183,147 @@ public class MapView extends ZoomPanLayout {
 		 * Fires when the rendering thread has completed updating the visible tiles, but before cleanup
 		 */
 		public void onRenderComplete();
+	}
+	
+	/**
+	 * Convenience class that implements {@MapEventListener}
+	 */
+	public static class MapEventListenerImplementation implements MapEventListener {
+
+		/**
+		 * Fires when a ACTION_DOWN event is raised from the MapView
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onFingerDown( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a ACTION_UP event is raised from the MapView
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onFingerUp( int x, int y ) {
+			
+		}
+		/**
+		 * Fires while the MapView is being dragged
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onDrag( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a user double-taps the MapView
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onDoubleTap( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a user taps the MapView
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onTap( int x, int y ) {
+			
+		}
+		/**
+		 * Fires while a user is pinching the MapView
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onPinch( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a user starts a pinch action
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onPinchStart( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a user completes a pinch action
+		 * @param x (int) the x position of the event
+		 * @param y (int) the y position of the event
+		 */
+		public void onPinchComplete( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a user initiates a fling action
+		 * @param sx (int) the x position of the start of the fling
+		 * @param sy (int) the y position of the start of the fling
+		 * @param dx (int) the x position of the end of the fling
+		 * @param dy (int) the y position of the end of the fling
+		 */
+		public void onFling( int sx, int sy, int dx, int dy ) {
+			
+		}
+		/**
+		 * Fires when a fling action has completed
+		 * @param x (int) the final x scroll position of the MapView after the fling
+		 * @param y (int) the final y scroll position of the MapView after the fling
+		 */
+		public void onFlingComplete( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when the MapView's scale has updated
+		 * @param scale (double) the new scale of the MapView (0-1)
+		 */
+		public void onScaleChanged( double scale ) {
+			
+		}
+		/**
+		 * Fires when the MapView's scroll position has updated
+		 * @param x (int) the new x scroll position of the MapView
+		 * @param y (int) the new y scroll position of the MapView
+		 */
+		public void onScrollChanged( int x, int y ) {
+			
+		}
+		/**
+		 * Fires when a zoom action starts (typically through a pinch of double-tap action,
+		 * or by programmatic animated zoom methods.
+		 * @param scale (double) the new scale of the MapView (0-1)
+		 */
+		public void onZoomStart( double scale ) {
+			
+		}
+		/**
+		 * Fires when a zoom action ends (typically through a pinch of double-tap action,
+		 * or by programmatic animated zoom methods.
+		 * @param scale (double) the new scale of the MapView (0-1)
+		 */
+		public void onZoomComplete( double scale ) {
+			
+		}
+		/**
+		 * Fires when the MapView should start using a new ZoomLevel
+		 * @param oldZoom (int) the zoom level the MapView was using before the change
+		 * @param currentZoom (int) the zoom level the MapView has changed to
+		 */
+		public void onZoomLevelChanged( int oldZoom, int currentZoom ) {
+			
+		}
+		/**
+		 * Fires when the rendering thread has started to update the visible tiles.
+		 */
+		public void onRenderStart() {
+			
+		}
+		/**
+		 * Fires when the rendering thread has completed updating the visible tiles, but before cleanup
+		 */
+		public void onRenderComplete() {
+			
+		}
+		
 	}
 
 }

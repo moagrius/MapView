@@ -14,7 +14,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	private int tileHeight;
 	private int mapWidth;
 	private int mapHeight;
-	
+
 	private long area;
 
 	private int rowCount;
@@ -28,11 +28,11 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	public ZoomLevel( ZoomManager zm, int mw, int mh, String p ) {
 		this( zm, mw, mh, p, null, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
 	}
-	
+
 	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, String d ) {
 		this( zm, mw, mh, p, d, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
 	}
-	
+
 	public ZoomLevel( ZoomManager zm, int mw, int mh, String p, int tw, int th ) {
 		this( zm, mw, mh, p, null, tw, th );
 	}
@@ -50,7 +50,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 		area = (long) ( mapWidth * mapHeight );
 	}
 
-	public LinkedList<MapTile> getIntersections() {
+	private LinkedList<MapTile> __getIntersections() {
 		int zoom = zoomManager.getZoom();
 		double scale = zoomManager.getRelativeScale();
 		double offsetWidth = tileWidth * scale;
@@ -67,6 +67,30 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 		int ec = (int) Math.ceil( boundedRect.right / offsetWidth );
 		for ( int r = sr; r <= er; r++ ) {
 			for ( int c = sc; c <= ec; c++ ) {
+				MapTile m = new MapTile( zoom, r, c, tileWidth, tileHeight, pattern );
+				intersections.add( m );
+			}
+		}
+		return intersections;
+	}
+
+	public LinkedList<MapTile> getIntersections() {
+		int zoom = zoomManager.getZoom();
+		double scale = zoomManager.getRelativeScale();
+		double offsetWidth = tileWidth * scale;
+		double offsetHeight = tileHeight * scale;
+		LinkedList<MapTile> intersections = new LinkedList<MapTile>();
+		Rect boundedRect = new Rect( zoomManager.getViewport() );
+		boundedRect.top = Math.max( boundedRect.top, 0 );
+		boundedRect.left = Math.max( boundedRect.left, 0 );
+		boundedRect.right = Math.min( boundedRect.right, (int) ( mapWidth * scale ) );
+		boundedRect.bottom = Math.min( boundedRect.bottom, (int) ( mapHeight * scale ) );
+		int sr = (int) Math.floor( boundedRect.top / offsetHeight );
+		int er = (int) Math.ceil( boundedRect.bottom / offsetHeight );
+		int sc = (int) Math.floor( boundedRect.left / offsetWidth );
+		int ec = (int) Math.ceil( boundedRect.right / offsetWidth );
+		for ( int r = sr; r < er; r++ ) {
+			for ( int c = sc; c < ec; c++ ) {
 				MapTile m = new MapTile( zoom, r, c, tileWidth, tileHeight, pattern );
 				intersections.add( m );
 			}
@@ -93,7 +117,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	public String getPattern() {
 		return pattern;
 	}
-	
+
 	public String getDownsample() {
 		return downsample;
 	}
@@ -126,8 +150,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	public boolean equals( Object o ) {
 		if ( o instanceof ZoomLevel ) {
 			ZoomLevel zl = (ZoomLevel) o;
-			return ( zl.getMapWidth() == getMapWidth() )
-				&& ( zl.getMapHeight() == getMapHeight() );
+			return ( zl.getMapWidth() == getMapWidth() ) && ( zl.getMapHeight() == getMapHeight() );
 		}
 		return false;
 	}

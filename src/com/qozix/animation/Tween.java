@@ -22,29 +22,29 @@ public class Tween {
 	}
 
 	public double getEasedProgress() {
-		return ease.compute(ellapsed, 0, 1, duration);
+		return ease.compute( ellapsed, 0, 1, duration );
 	}
 
-	public void setAnimationEase(EasingEquation e) {
-		if (e == null || !(e instanceof EasingEquation)) {
+	public void setAnimationEase( EasingEquation e ) {
+		if ( e == null ) {
 			e = Linear.EaseNone;
 		}
 		ease = e;
 	}
 
-	public void addTweenListener(TweenListener l) {
-		listeners.add(l);
+	public void addTweenListener( TweenListener l ) {
+		listeners.add( l );
 	}
 
-	public void removeTweenListener(TweenListener l) {
-		listeners.remove(l);
+	public void removeTweenListener( TweenListener l ) {
+		listeners.remove( l );
 	}
 
 	public double getDuration() {
 		return duration;
 	}
 
-	public void setDuration(double time) {
+	public void setDuration( double time ) {
 		duration = time;
 	}
 
@@ -52,36 +52,37 @@ public class Tween {
 		stop();
 		ellapsed = 0;
 		startTime = System.currentTimeMillis();
-		for (TweenListener l : listeners) {
+		for ( TweenListener l : listeners ) {
 			l.onTweenStart();
 		}
-		handler.sendEmptyMessage(0);
+		handler.sendEmptyMessage( 0 );
 	}
-	
-	public void stop(){
-		if (handler.hasMessages(0)) {
-			handler.removeMessages(0);
+
+	public void stop() {
+		if ( handler.hasMessages( 0 ) ) {
+			handler.removeMessages( 0 );
 		}
 	}
 
 	private Handler handler = new Handler() {
 		@Override
-		public void handleMessage(final Message message) {
+		public void handleMessage( final Message message ) {
 			ellapsed = System.currentTimeMillis() - startTime;
+			ellapsed = Math.min( ellapsed, duration );
 			double progress = getProgress();
 			double eased = getEasedProgress();
-			for (TweenListener l : listeners) {
-				l.onTweenProgress(progress, eased);
+			for ( TweenListener l : listeners ) {
+				l.onTweenProgress( progress, eased );
 			}
-			if (ellapsed >= duration) {
-				if (hasMessages(0)) {
-					removeMessages(0);
+			if ( ellapsed >= duration ) {
+				if ( hasMessages( 0 ) ) {
+					removeMessages( 0 );
 				}
-				for (TweenListener l : listeners) {
+				for ( TweenListener l : listeners ) {
 					l.onTweenComplete();
 				}
 			} else {
-				sendEmptyMessage(0);
+				sendEmptyMessage( 0 );
 			}
 
 		}

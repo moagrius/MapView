@@ -85,11 +85,5 @@ public class FixedLayout extends ViewGroup {
 		public LayoutParams(ViewGroup.LayoutParams source) {
 			super(source);
 		}
-		
-		@Override
-		public String toString(){
-			return "(x=" + x + ", y=" + y + ", w=" + width + ", h=" + height + ")";
-		}
-
 	}
 }

@@ -26,7 +26,8 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 	private LinkedList<MapTile> scheduledToRender = new LinkedList<MapTile>();
 	private LinkedList<MapTile> alreadyRendered = new LinkedList<MapTile>();
 
-	private HashMap<Integer, ScalingLayout> tileGroups = new HashMap<Integer, ScalingLayout>();  // ignore this lint - HashMap is preferred here.
+	private MapTileDecoder decoder = new MapTileDecoderAssets();
+	private HashMap<Integer, ScalingLayout> tileGroups = new HashMap<Integer, ScalingLayout>();
 
 	private TileRenderListener renderListener;
 	
@@ -49,6 +50,10 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 		zoomManager = zm;
 		zoomManager.addZoomListener( this );		
 		handler = new TileRenderHandler( this );
+	}
+	
+	public void setDecoder( MapTileDecoder d ){
+		decoder = d;
 	}
 	
 	public void setCacheEnabled( boolean shouldCache ) {
@@ -294,7 +299,7 @@ public class TileManager extends ScalingLayout implements ZoomListener {
 	}
 	
 	void decodeIndividualTile( MapTile m ) {
-		m.decode( getContext(), cache );
+		m.decode( getContext(), cache, decoder );
 	}
 
 	void renderIndividualTile( MapTile m ) {

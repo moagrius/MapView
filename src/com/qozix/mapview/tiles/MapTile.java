@@ -104,7 +104,7 @@ public class MapTile {
 		return pattern.replace( "%col%", Integer.toString( column ) ).replace( "%row%", Integer.toString( row ) );
 	}
 
-	public void decode( Context context, MapTileCache cache ) {
+	public void decode( Context context, MapTileCache cache, MapTileDecoder decoder ) {
 		if ( hasBitmap ) {
 			return;
 		}
@@ -116,28 +116,11 @@ public class MapTile {
 				return;
 			}	
 		}			
-		AssetManager assets = context.getAssets();
-		try {
-			InputStream input = assets.open( fileName );
-			if ( input != null ) {
-				try {
-					bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
-					hasBitmap = ( bitmap != null );
-					if ( cache != null ) {
-						cache.addBitmap( fileName, bitmap );
-					}					
-				} catch ( OutOfMemoryError oom ) {
-					Log.d( TAG, "oom - you can try sleeping (this method won't be called in the UI thread) or try again (or give up): " + oom.getMessage() );
-				} catch ( Exception e ) {
-					Log.d( TAG, "unknown error decoding bitmap: " + e.getMessage() );
-				}
-			}
-		} catch ( IOException io ) {
-			Log.d( TAG, "io error - probably can't find the file: " + io.getMessage() );
-		} catch ( Exception e ) {
-			Log.d( TAG, "unknown error opening the asset: " + e.getMessage() );
+		bitmap = decoder.decode( fileName, context );
+		hasBitmap = ( bitmap != null );
+		if ( cache != null ) {
+			cache.addBitmap( fileName, bitmap );
 		}
-
 	}
 
 	public boolean render( Context context ) {

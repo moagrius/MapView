@@ -26,13 +26,13 @@ public class MarkerManager extends TranslationLayout implements ZoomListener {
 	}	
 	
 	public View addMarker( View v, int x, int y ){
-		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, (int) ( x / scale ), (int) ( y / scale ) );
+		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, x, y );
 		addView( v, lp );
 		return v;
 	}
 
 	public View addMarker( View v, int x, int y, float aX, float aY ) {
-		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, (int) ( x / scale ), (int) ( y / scale ), aX, aY );
+		LayoutParams lp = new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, x, y, aX, aY );
 		addView( v, lp );
 		return v;
 	}

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -18,9 +17,17 @@ import com.qozix.animation.TweenListener;
 import com.qozix.animation.easing.Strong;
 import com.qozix.widgets.Scroller;
 
-public class ZoomPanLayout extends ViewGroup {
+/**
+ * ZoomPanLayout extends ViewGroup to provide support for scrolling and zooming.  Fling, drag, pinch and
+ * double-tap events are supported natively.
+ * 
+ * ZoomPanLayout does not support direct insertion of child Views, and manages positioning through an intermediary View.
+ * the addChild method provides an interface to add layouts to that intermediary view.  Each of these children are provided
+ * with LayoutParams of MATCH_PARENT for both axes, and will always be positioned at 0,0, so should generally be ViewGroups
+ * themselves (RelativeLayouts or FrameLayouts are generally appropriate).
+ */
 
-	private static final String TAG = ZoomPanLayout.class.getSimpleName();
+public class ZoomPanLayout extends ViewGroup {
 
 	private static final int MINIMUM_VELOCITY = 50;
 	private static final int ZOOM_ANIMATION_DURATION = 500;
@@ -40,7 +47,7 @@ public class ZoomPanLayout extends ViewGroup {
 	private double scale = 1;
 	private double historicalScale = 1;
 
-	private double minScale = 0.2;
+	private double minScale = 0;
 	private double maxScale = 1;
 
 	private boolean scaleToFit = true;
@@ -120,6 +127,10 @@ public class ZoomPanLayout extends ViewGroup {
 		tween.addTweenListener( tweenListener );
 	}
 
+	/**
+	 * Constructor to use when creating a ZoomPanLayout from code.  Inflating from XML is not currently supported.
+	 * @param context (Context) The Context the ZoomPanLayout is running in, through which it can access the current theme, resources, etc.
+	 */
 	public ZoomPanLayout( Context context ) {
 
 		super( context );
@@ -136,31 +147,26 @@ public class ZoomPanLayout extends ViewGroup {
 		updateClip();
 	}
 
-	@Override
-	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
-		measureChildren( widthMeasureSpec, heightMeasureSpec );
-		int w = clip.getMeasuredWidth();
-		int h = clip.getMeasuredHeight();
-		w = Math.max( w, getSuggestedMinimumWidth() );
-		h = Math.max( h, getSuggestedMinimumHeight() );
-		w = resolveSize( w, widthMeasureSpec );
-		h = resolveSize( h, heightMeasureSpec );
-		setMeasuredDimension( w, h );
-	}
+	//------------------------------------------------------------------------------------
+	// PUBLIC API
+	//------------------------------------------------------------------------------------
 
-	@Override
-	protected void onLayout( boolean changed, int l, int t, int r, int b ) {
-		clip.layout( 0, 0, clip.getMeasuredWidth(), clip.getMeasuredHeight() );
-		if ( changed ) {
-			calculateMinimumScaleToFit();
-		}
-	}
-
-	public void setScaleToFit( boolean v ) {
-		scaleToFit = v;
+	/**
+	 * Determines whether the ZoomPanLayout should limit it's minimum scale to no less than what would be required to fill it's container
+	 * @param shouldScaleToFit (boolean) True to limit minimum scale, false to allow arbitrary minimum scale (see {@link setScaleLimits})
+	 */
+	public void setScaleToFit( boolean shouldScaleToFit ) {
+		scaleToFit = shouldScaleToFit;
 		calculateMinimumScaleToFit();
 	}
 
+	/**
+	 * Set minimum and maximum scale values for this ZoomPanLayout. 
+	 * Note that if {@link shouldScaleToFit} is set to true, the minimum value set here will be ignored
+	 * Default values are 0 and 1.
+	 * @param min
+	 * @param max
+	 */
 	public void setScaleLimits( double min, double max ) {
 		// if scaleToFit is set, don't allow overwrite
 		if ( !scaleToFit ) {
@@ -170,22 +176,23 @@ public class ZoomPanLayout extends ViewGroup {
 		setScale( scale );
 	}
 	
+	/**
+	 * Sets whether the ZoomPanLayout should intercept touch events on it's child views.
+	 * If true, the ZoomPanLayout will intercept touch events, so that touch events on child views
+	 * will not consume the event, so gestures (drag, fling) on the ZoomPanLayout will not be interrupted.
+	 * If false, child views will consume touch events normally, and will interrupt gesture events on the 
+	 * containing ZoomPanLayout
+	 * @param intercept (boolean) Boolean value indicating whether the ZoomPanLayout should intercept touch events
+	 */
 	public void setShouldIntercept( boolean intercept ){
 		shouldIntercept = intercept;
 	}
 
-	private void calculateMinimumScaleToFit() {
-		if ( scaleToFit ) {
-			double minimumScaleX = getWidth() / (double) baseWidth;
-			double minimumScaleY = getHeight() / (double) baseHeight;
-			double recalculatedMinScale = Math.max( minimumScaleX, minimumScaleY );
-			if ( recalculatedMinScale != minScale ) {
-				minScale = recalculatedMinScale;
-				setScale( scale );
-			}
-		}
-	}
-
+	/**
+	 * Sets the size (width and height) of the ZoomPanLayout as it should be rendered at a scale of 1f (100%)
+	 * @param wide width
+	 * @param tall height
+	 */
 	public void setSize( int wide, int tall ) {
 		baseWidth = wide;
 		baseHeight = tall;
@@ -194,18 +201,34 @@ public class ZoomPanLayout extends ViewGroup {
 		updateClip();
 	}
 
+	/**
+	 * Returns the base (un-scaled) width
+	 * @return (int) base width
+	 */
 	public int getBaseWidth() {
 		return baseWidth;
 	}
 
+	/**
+	 * Returns the base (un-scaled) height
+	 * @return (int) base height
+	 */
 	public int getBaseHeight() {
 		return baseHeight;
 	}
 
+	/**
+	 * Returns the scaled width
+	 * @return (int) scaled width
+	 */
 	public int getScaledWidth() {
 		return scaledWidth;
 	}
 
+	/**
+	 * Returns the scaled height
+	 * @return (int) scaled height
+	 */
 	public int getScaledHeight() {
 		return scaledHeight;
 	}
@@ -238,13 +261,186 @@ public class ZoomPanLayout extends ViewGroup {
 		return scale;
 	}
 	
+	/**
+	 * Returns whether the ZoomPanLayout is currently being flung
+	 * @return (boolean) true if the ZoomPanLayout is currently flinging, false otherwise
+	 */
 	public boolean isFlinging(){
 		return isBeingFlung;
 	}
 	
+	/**
+	 * Returns the single child of the ZoomPanLayout, a ViewGroup that serves as an intermediary container
+	 * @return (View) The child view of the ZoomPanLayout that manages all contained views
+	 */
 	protected View getClip() {
 		return clip;
 	}
+	
+	/**
+	 * Adds a GestureListener to the ZoomPanLayout, which will receive gesture events
+	 * @param listener (GestureListener) Listener to add
+	 * @return (boolean) true when the listener set did not already contain the Listener, false otherwise 
+	 */
+	public boolean addGestureListener( GestureListener listener ) {
+		return gestureListeners.add( listener );
+	}
+
+	/**
+	 * Removes a GestureListener from the ZoomPanLayout
+	 * @param listener (GestureListener) Listener to remove
+	 * @return (boolean) if the Listener was removed, false otherwise
+	 */
+	public boolean removeGestureListener( GestureListener listener ) {
+		return gestureListeners.remove( listener );
+	}
+
+	/**
+	 * Adds a ZoomPanListener to the ZoomPanLayout, which will receive events relating to zoom and pan actions
+	 * @param listener (ZoomPanListener) Listener to add
+	 * @return (boolean) true when the listener set did not already contain the Listener, false otherwise 
+	 */
+	public boolean addZoomPanListener( ZoomPanListener listener ) {
+		return zoomPanListeners.add( listener );
+	}
+
+	/**
+	 * Removes a ZoomPanListener from the ZoomPanLayout
+	 * @param listener (ZoomPanListener) Listener to remove
+	 * @return (boolean) if the Listener was removed, false otherwise
+	 */
+	public boolean removeZoomPanListener( ZoomPanListener listener ) {
+		return zoomPanListeners.remove( listener );
+	}
+	
+	/**
+	 * Scrolls the ZoomPanLayout to the x and y values specified by {@param point} Point
+	 * @param point (Point) Point instance containing the destination x and y values
+	 */
+	public void scrollToPoint( Point point ) {
+		constrainPoint( point );
+		int ox = getScrollX();
+		int oy = getScrollY();
+		int nx = (int) point.x;
+		int ny = (int) point.y;
+		scrollTo( nx, ny );
+		if ( ox != nx || oy != ny ) {
+			for ( ZoomPanListener listener : zoomPanListeners ) {
+				listener.onScrollChanged( nx, ny );
+				listener.onZoomPanEvent();
+			}
+		}
+	}
+
+	/**
+	 * Scrolls and centers the ZoomPanLayout to the x and y values specified by {@param point} Point
+	 * @param point (Point) Point instance containing the destination x and y values
+	 */
+	public void scrollToAndCenter( Point point ) { // TODO:
+		int x = (int) -(getWidth() * 0.5);
+		int y = (int) -(getHeight() * 0.5);
+		point.offset( x , y );
+		scrollToPoint( point );
+	}
+
+	/**
+	 * Scrolls the ZoomPanLayout to the x and y values specified by {@param point} Point using scrolling animation
+	 * @param point (Point) Point instance containing the destination x and y values
+	 */
+	public void slideToPoint( Point point ) { // TODO:
+		constrainPoint( point );
+		int startX = getScrollX();
+		int startY = getScrollY();
+		int dx = point.x - startX;
+		int dy = point.y - startY;
+		scroller.startScroll( startX, startY, dx, dy, SLIDE_DURATION );
+	}
+
+	/**
+	 * Scrolls and centers the ZoomPanLayout to the x and y values specified by {@param point} Point using scrolling animation
+	 * @param point (Point) Point instance containing the destination x and y values
+	 */
+	public void slideToAndCenter( Point point ) { // TODO:
+		int x = (int) -(getWidth() * 0.5);
+		int y = (int) -(getHeight() * 0.5);
+		point.offset( x , y );
+		slideToPoint( point );
+	}
+	
+	/**
+	 * Adds a View to the intermediary ViewGroup that manages layout for the ZoomPanLayout.
+	 * This View will be laid out at the width and height specified by {@setSize} at 0, 0
+	 * @param child (View) The View to be added to the ZoomPanLayout view tree
+	 */
+	public void addChild( View child ) {
+		LayoutParams lp = new LayoutParams( scaledWidth, scaledHeight );
+		clip.addView( child, lp );
+	}
+
+	/**
+	 * Removes a View from the intermediary ViewGroup that manages layout for this ZoomPanLayout
+	 * @param child (View) The View to be removed
+	 */
+	public void removeChild( View child ) {
+		if ( clip.indexOfChild( child ) > -1 ) {
+			clip.removeView( child );
+		}
+	}
+	
+	/**
+	 * Scales the ZoomPanLayout with animated progress
+	 * @param destination (double) The final scale to animate to
+	 * @param duration (int) The duration (in milliseconds) of the animation
+	 */
+	public void smoothScaleTo( double destination, int duration ) {
+		if ( isTweening ) {
+			return;
+		}
+		doubleTapDestinationScale = destination;
+		tween.setDuration( duration );
+		tween.start();
+	}
+	
+	
+	
+	//------------------------------------------------------------------------------------
+	// PRIVATE/PROTECTED
+	//------------------------------------------------------------------------------------
+	
+	@Override
+	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
+		measureChildren( widthMeasureSpec, heightMeasureSpec );
+		int w = clip.getMeasuredWidth();
+		int h = clip.getMeasuredHeight();
+		w = Math.max( w, getSuggestedMinimumWidth() );
+		h = Math.max( h, getSuggestedMinimumHeight() );
+		w = resolveSize( w, widthMeasureSpec );
+		h = resolveSize( h, heightMeasureSpec );
+		setMeasuredDimension( w, h );
+	}
+
+	@Override
+	protected void onLayout( boolean changed, int l, int t, int r, int b ) {
+		clip.layout( 0, 0, clip.getMeasuredWidth(), clip.getMeasuredHeight() );
+		if ( changed ) {
+			calculateMinimumScaleToFit();
+		}
+	}
+
+	
+
+	private void calculateMinimumScaleToFit() {
+		if ( scaleToFit ) {
+			double minimumScaleX = getWidth() / (double) baseWidth;
+			double minimumScaleY = getHeight() / (double) baseHeight;
+			double recalculatedMinScale = Math.max( minimumScaleX, minimumScaleY );
+			if ( recalculatedMinScale != minScale ) {
+				minScale = recalculatedMinScale;
+				setScale( scale );
+			}
+		}
+	}
+
 
 	private void updateClip() {
 		updateViewClip( clip );
@@ -262,21 +458,6 @@ public class ZoomPanLayout extends ViewGroup {
 		v.setLayoutParams( lp );
 	}
 
-	public boolean addGestureListener( GestureListener listener ) {
-		return gestureListeners.add( listener );
-	}
-
-	public boolean removeGestureListener( GestureListener listener ) {
-		return gestureListeners.remove( listener );
-	}
-
-	public boolean addZoomPanListener( ZoomPanListener listener ) {
-		return zoomPanListeners.add( listener );
-	}
-
-	public boolean removeZoomPanListener( ZoomPanListener listener ) {
-		return zoomPanListeners.remove( listener );
-	}
 
 	@Override
 	public void computeScroll() {
@@ -320,43 +501,7 @@ public class ZoomPanLayout extends ViewGroup {
 		}
 	}
 
-	public void scrollToPoint( Point point ) {
-		constrainPoint( point );
-		int ox = getScrollX();
-		int oy = getScrollY();
-		int nx = (int) point.x;
-		int ny = (int) point.y;
-		scrollTo( nx, ny );
-		if ( ox != nx || oy != ny ) {
-			for ( ZoomPanListener listener : zoomPanListeners ) {
-				listener.onScrollChanged( nx, ny );
-				listener.onZoomPanEvent();
-			}
-		}
-	}
-
-	public void scrollToAndCenter( Point point ) { // TODO:
-		int x = (int) -(getWidth() * 0.5);
-		int y = (int) -(getHeight() * 0.5);
-		point.offset( x , y );
-		scrollToPoint( point );
-	}
-
-	public void slideToPoint( Point point ) { // TODO:
-		constrainPoint( point );
-		int startX = getScrollX();
-		int startY = getScrollY();
-		int dx = point.x - startX;
-		int dy = point.y - startY;
-		scroller.startScroll( startX, startY, dx, dy, SLIDE_DURATION );
-	}
-
-	public void slideToAndCenter( Point point ) { // TODO:
-		int x = (int) -(getWidth() * 0.5);
-		int y = (int) -(getHeight() * 0.5);
-		point.offset( x , y );
-		slideToPoint( point );
-	}
+	
 
 	private void constrainScroll() { // TODO:
 		Point currentScroll = new Point( getScrollX(), getScrollY() );
@@ -375,16 +520,6 @@ public class ZoomPanLayout extends ViewGroup {
 		return scaledHeight - getHeight();
 	}
 
-	public void addChild( View child ) {
-		LayoutParams lp = new LayoutParams( scaledWidth, scaledHeight );
-		clip.addView( child, lp );
-	}
-
-	public void removeChild( View v ) {
-		if ( clip.indexOfChild( v ) > -1 ) {
-			clip.removeView( v );
-		}
-	}
 
 	@Override
 	public void addView( View child ) {
@@ -396,14 +531,6 @@ public class ZoomPanLayout extends ViewGroup {
 		throw new UnsupportedOperationException( "ZoomPanLayout does not allow direct removal of child views.  Use removeChild() instead." );
 	}
 
-	public void smoothScaleTo( double destination, int duration ) {
-		if ( isTweening ) {
-			return;
-		}
-		doubleTapDestinationScale = destination;
-		tween.setDuration( duration );
-		tween.start();
-	}
 
 	private void saveHistoricalScale() {
 		historicalScale = scale;
@@ -698,6 +825,10 @@ public class ZoomPanLayout extends ViewGroup {
 			}
 		}
 	}
+
+	//------------------------------------------------------------------------------------
+	// Public static interfaces and classes
+	//------------------------------------------------------------------------------------
 
 	public static interface ZoomPanListener {
 		public void onScaleChanged( double scale );

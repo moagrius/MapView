@@ -1,3 +1,17 @@
+<p><strong>Update (April 20, 2013):</strong></p>
+<p>
+    Updating to 1.0.2, fixing a couple bugs, adding support for custom Bitmap decoders, improved intersection calculation
+    (thanks to <a target="_blank" href="https://github.com/frankowskid">frankowskid</a>), and some standardization.
+</p>
+<p>Changes:</p>
+<ol>
+  <li>Fixed bug in pixel-based positioning created in 1.0.1</li>
+  <li>Marker anchors are no longer "flipped" (if you want the marker to be offset by a negative value equal to half its width, use -0.5f... It used to be non-negative 0.5)</li>
+  <li>Added new method (and interface) `setTileDecoder`, which allows the user to provide an implementation of a class to decode Bitmaps in an arbitrary fashion (assets, resources, http, SVG, dynamically-drawn, etc)</li>
+  <li>Added concrete implementation of `MapEventListener` called `MapEventListenerImplementation`, that impelemts all signatures so you can just override the one's you're using</li>
+  <li>Updated documentation</li>
+</ol>
+
 <p><strong>Update (March 28, 2013):</strong></p>
 <p>Updating to 1.0.1, fixing several bugs, reinstituting undocumented or previously removed features, and adding some experimental stuff.</p>
 
