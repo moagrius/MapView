@@ -1,0 +1,13 @@
+com.qozix.animation
+com.qozix.animation.easing
+com.qozix.geom
+com.qozix.layouts
+com.qozix.mapview
+com.qozix.mapview.geom
+com.qozix.mapview.hotspots
+com.qozix.mapview.markers
+com.qozix.mapview.paths
+com.qozix.mapview.tiles
+com.qozix.mapview.viewmanagers
+com.qozix.mapview.zoom
+com.qozix.widgets
