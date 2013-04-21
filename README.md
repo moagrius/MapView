@@ -9,7 +9,7 @@
   <li>Marker anchors are no longer "flipped" (if you want the marker to be offset by a negative value equal to half its width, use -0.5f... It used to be non-negative 0.5)</li>
   <li>Added new method (and interface) `setTileDecoder`, which allows the user to provide an implementation of a class to decode Bitmaps in an arbitrary fashion (assets, resources, http, SVG, dynamically-drawn, etc)</li>
   <li>Added concrete implementation of `MapEventListener` called `MapEventListenerImplementation`, that impelemts all signatures so you can just override the one's you're using</li>
-  <li>Updated documentation</li>
+  <li>Updated <a target="_blank" href="http://moagrius.github.io/MapView/documentation/">documentation</a></li>
 </ol>
 
 <p><strong>Update (March 28, 2013):</strong></p>
@@ -54,7 +54,7 @@
   the previous version in it's entirely should be considered deprecated, and replaced with this release.
 </p>
 <p>
-  The <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">documentation</a> has been updated as well.
+  The <a href="http://moagrius.github.com/MapView/documentation">documentation</a> has been updated as well.
 </p>
 
 <p>An quick-n-dirty, undated, unversioned and incomplete changelog:</p>
@@ -158,7 +158,7 @@ mapView.addMarker(anotherView, 42.3665, -71.05224);
 ```
 
 <h4>Documentation</h4>
-<p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation/reference/com/qozix/mapview/MapView.html">here</a>.</p>
+<p>Javadocs are <a href="http://moagrius.github.com/MapView/documentation">here</a>.</p>
 
 <h4>License</h4>
 <p>Licensed under <a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons</a></p>
