@@ -397,6 +397,8 @@ public class MapView extends ZoomPanLayout {
 	public void moveTo( double x, double y, boolean absolute ) {
 		int[] position = getPosition( x, y, absolute );
 		Point point = new Point( position[0], position[1] );
+		point.x *= getScale();
+		point.y *= getScale();
 		scrollToPoint( point );
 	}
 	
@@ -424,6 +426,8 @@ public class MapView extends ZoomPanLayout {
 	public void moveToAndCenter( double x, double y, boolean absolute ) {
 		int[] position = getPosition( x, y, absolute );
 		Point point = new Point( position[0], position[1] );
+		point.x *= getScale();
+		point.y *= getScale();
 		scrollToAndCenter( point );
 	}
 	
@@ -451,6 +455,8 @@ public class MapView extends ZoomPanLayout {
 	public void slideTo( double x, double y, boolean absolute ){
 		int[] position = getPosition( x, y, absolute );
 		Point point = new Point( position[0], position[1] );
+		point.x *= getScale();
+		point.y *= getScale();
 		slideToPoint( point );
 	}
 	
@@ -478,6 +484,8 @@ public class MapView extends ZoomPanLayout {
 	public void slideToAndCenter( double x, double y, boolean absolute ) {
 		int[] position = getPosition( x, y, absolute );
 		Point point = new Point( position[0], position[1] );
+		point.x *= getScale();
+		point.y *= getScale();
 		slideToAndCenter( point );
 	}
 	

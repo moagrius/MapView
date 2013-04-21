@@ -17,20 +17,19 @@ public class ManagedGeolocator extends Geolocator implements ZoomListener {
 	}
 	
 	private void update(){
-		int w = zoomManager.getCurrentScaledWidth();
-		int h = zoomManager.getCurrentScaledHeight();
-		Log.d( "ManagedGeolocator", w + ":" + h);
+		int w = zoomManager.getComputedCurrentWidth();
+		int h = zoomManager.getComputedCurrentHeight();
 		setSize( w, h );
 	}
 	
 	@Override
 	public void onZoomLevelChanged( int oldZoom, int newZoom ) {
-		
+		update();
 	}
 
 	@Override
 	public void onZoomScaleChanged( double scale ) {
-		update();
+		
 	}	
 
 }
