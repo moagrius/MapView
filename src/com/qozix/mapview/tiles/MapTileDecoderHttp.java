@@ -10,6 +10,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+/**
+ * Implementation of MapTileDecoder that loads bitmaps from a HTTP server
+ * thanks to https://github.com/mohlendo for pointing out the need and a solution
+ */
 public class MapTileDecoderHttp implements MapTileDecoder {
 
 	private static final BitmapFactory.Options OPTIONS = new BitmapFactory.Options();
