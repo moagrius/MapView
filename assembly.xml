@@ -13,7 +13,7 @@
             <unpack>true</unpack>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.google.android:support-v4</exclude>
+                <exclude>android.support:compatibility-v4</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
