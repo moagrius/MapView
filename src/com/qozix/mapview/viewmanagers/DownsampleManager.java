@@ -10,6 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.View;
 
+import com.qozix.mapview.tiles.MapTileDecoder;
+import com.qozix.mapview.tiles.MapTileDecoderAssets;
+
 public class DownsampleManager {
 
 	private static final BitmapFactory.Options OPTIONS = new BitmapFactory.Options();
@@ -18,6 +21,13 @@ public class DownsampleManager {
 	}
 	
 	private String lastFileName;
+	private MapTileDecoder decoder = new MapTileDecoderAssets();
+	
+	public void setDecoder( MapTileDecoder d ){
+		if (d == null)
+			throw new IllegalArgumentException("d cannot be NULL.");
+		decoder = d;
+	}
 	
 	public void setDownsample( View view, String fileName ) {		
 		if ( fileName == null ) {
@@ -25,25 +35,22 @@ public class DownsampleManager {
 			lastFileName = null;
 			return;
 		}
+		// TODO: Maybe the tile decoder should decide this?
 		if ( fileName.equals( lastFileName )) {
 			return;
 		}		
 		lastFileName = fileName;
 		Context context = view.getContext();
-		AssetManager assets = context.getAssets();
+		
 		try {
-			InputStream input = assets.open( fileName );
-			if ( input != null ) {
-				try {
-					Bitmap bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
-					BitmapDrawable bitmapDrawable = new BitmapDrawable( bitmap );
-					view.setBackgroundDrawable( bitmapDrawable );
-				} catch( Exception e ) {
-					
-				}
+			Bitmap bitmap = decoder.decode(fileName, context);
+			
+			if (bitmap != null) {
+				BitmapDrawable bitmapDrawable = new BitmapDrawable( bitmap );
+				view.setBackgroundDrawable( bitmapDrawable );
 			}
 		} catch (Exception e ) {
-			
+			// TODO: Swallowing exceptions is not a good idea IMO
 		}
 	}
 }

@@ -188,6 +188,17 @@ public class MapView extends ZoomPanLayout {
 		tileManager.setDecoder( decoder );
 	}
 	
+	/**
+	 * Sets a custom class to perform the decode operation when a downsample image is requested.
+	 * By default, a MapTileDecoder implementation is provided that renders bitmaps from the context's Assets,
+	 * but alternative implementations could be used that fetch images via HTTP, or from the SD card, or resources, SVG, etc.
+	 * {@link MapTileDecoderHttp} is an example of such an implementation.
+	 * @param decoder (MapTileDecoder) A class instance that implements MapTileDecoder, and must define a decode method, which accepts a String file name and a Context object, and returns a Bitmap
+	 */
+	public void setDownsampleDecoder( MapTileDecoder decoder ) {
+		downsampleManager.setDecoder( decoder );
+	}
+	
 	//------------------------------------------------------------------------------------
 	// Zoom Management API
 	//------------------------------------------------------------------------------------
