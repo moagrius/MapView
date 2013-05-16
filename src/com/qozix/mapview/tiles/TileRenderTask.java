@@ -2,14 +2,19 @@ package com.qozix.mapview.tiles;
 
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 class TileRenderTask extends AsyncTask<Void, MapTile, Void> {
 
-	private final WeakReference<TileManager> reference;
-	
-	// package level access
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final WeakReference<TileManager> reference;
+    private final AtomicInteger numberOfTilesToRender = new AtomicInteger();
+
+    // package level access
 	TileRenderTask( TileManager tm ) {
 		super();
 		reference = new WeakReference<TileManager>( tm );
@@ -46,50 +51,76 @@ class TileRenderTask extends AsyncTask<Void, MapTile, Void> {
 				if ( isCancelled() ) {
 					return null;
 				}
-				// once the bitmap is decoded, the heavy lift is done
-				tileManager.decodeIndividualTile( m );
-				// pass it to the UI thread for insertion into the view tree
-				publishProgress( m );
+
+                // create new AsyncTask for each tile and render them
+                new AsyncTask<MapTile, Void, MapTile>() {
+
+                    @Override
+                    protected MapTile doInBackground(MapTile... params) {
+                        Log.d("MapTile render", Thread.currentThread().getName());
+                        numberOfTilesToRender.incrementAndGet();
+                        TileManager tileManager = reference.get();
+                        if ( tileManager == null ) {
+                            return null;
+                        }
+                        // quit if we've been forcibly stopped
+                        if ( tileManager.getRenderIsCancelled() ) {
+                            return null;
+                        }
+                        // quit if task has been cancelled or replaced
+                        if ( isCancelled() ) {
+                            return null;
+                        }
+                        MapTile mapTile = params[0];
+                        // decode the map tile bitmap
+                        tileManager.decodeIndividualTile(mapTile);
+                        return mapTile;
+                    }
+
+                    @Override
+                    protected void onPostExecute(MapTile mapTile) {
+                        // stop if tile is null
+                        if (mapTile == null) {
+                            return;
+                        }
+                        TileManager tileManager = reference.get();
+                        if(tileManager != null) {
+                            // if not cancelled render the tile
+                            if(!tileManager.getRenderIsCancelled()) {
+                                tileManager.renderIndividualTile(mapTile);
+                            }
+
+                            // when we have finished every render task, inform the manager
+                            if(numberOfTilesToRender.decrementAndGet() == 0) {
+                                tileManager.onRenderTaskPostExecute();
+                            }
+                        }
+                    }
+                }.executeOnExecutor(executor, m);
 			}
-			
 		}		
 		return null;
 	}
 
-	@Override
-	protected void onProgressUpdate( MapTile... params ) {
-		// have we been stopped or dereffed?
-		TileManager tileManager = reference.get();
-		// if not go ahead but check other cancel states
-		if ( tileManager != null ) {
-			// quit if it's been force-stopped
-			if ( tileManager.getRenderIsCancelled() ) {
-				return;
-			}
-			// quit if it's been stopped or replaced by a new task
-			if ( isCancelled() ) {
-				return;
-			}
-			// tile should already have bitmap decoded
-			MapTile m = params[0];
-			// add the bitmap to it's view, add the view to the current zoom layout
-			tileManager.renderIndividualTile( m );
-		}
-		
-	}
-
-	@Override
-	protected void onPostExecute( Void param ) {
-		// have we been stopped or dereffed?
-		TileManager tileManager = reference.get();
-		// if not go ahead but check other cancel states
-		if ( tileManager != null ) {
-			tileManager.onRenderTaskPostExecute();
-		}
-	}
 
 	@Override
 	protected void onCancelled() {
+        executor.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!executor.awaitTermination(30, TimeUnit.SECONDS))
+                    System.err.println("Pool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            executor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
+
 		// have we been stopped or dereffed?
 		TileManager tileManager = reference.get();
 		// if not go ahead but check other cancel states
@@ -97,5 +128,4 @@ class TileRenderTask extends AsyncTask<Void, MapTile, Void> {
 			tileManager.onRenderTaskCancelled();
 		}
 	}
-
 }
