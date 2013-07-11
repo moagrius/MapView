@@ -1,27 +1,29 @@
 package com.qozix.mapview.viewmanagers;
 
-import java.io.InputStream;
-
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
+
+import com.qozix.mapview.tiles.MapTileDecoder;
+import com.qozix.mapview.tiles.MapTileDecoderAssets;
 
 public class DownsampleManager {
 
-	private static final BitmapFactory.Options OPTIONS = new BitmapFactory.Options();
-	static {
-		OPTIONS.inPreferredConfig = Bitmap.Config.RGB_565;
-	}
+	private MapTileDecoder decoder = new MapTileDecoderAssets();
 	
 	private String lastFileName;
 	
+	public void setDecoder( MapTileDecoder d ){
+		decoder = d;
+	}
+	
 	public void setDownsample( View view, String fileName ) {		
 		if ( fileName == null ) {
-			view.setBackgroundDrawable( null );
+			setDownsampleBackground( view, null );
 			lastFileName = null;
 			return;
 		}
@@ -30,20 +32,19 @@ public class DownsampleManager {
 		}		
 		lastFileName = fileName;
 		Context context = view.getContext();
-		AssetManager assets = context.getAssets();
-		try {
-			InputStream input = assets.open( fileName );
-			if ( input != null ) {
-				try {
-					Bitmap bitmap = BitmapFactory.decodeStream( input, null, OPTIONS );
-					BitmapDrawable bitmapDrawable = new BitmapDrawable( bitmap );
-					view.setBackgroundDrawable( bitmapDrawable );
-				} catch( Exception e ) {
-					
-				}
-			}
-		} catch (Exception e ) {
-			
+		Bitmap bitmap = decoder.decode( fileName, context );
+		BitmapDrawable bitmapDrawable = new BitmapDrawable( context.getResources(), bitmap );
+		setDownsampleBackground( view, bitmapDrawable );
+	}
+	
+	// suppress deprecation because we're doing the only thing we can do with Android breaking API
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	@SuppressWarnings("deprecation")
+	private void setDownsampleBackground( View view, Drawable drawable ){
+		if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			view.setBackgroundDrawable( drawable );
+		} else {
+			view.setBackground( drawable );
 		}
 	}
 }

@@ -43,7 +43,9 @@ public class ZoomManager {
 	
 	private boolean zoomLocked = false;
 	
+	private int padding = 0;
 	private Rect viewport = new Rect();
+	private Rect computedViewport = new Rect();
 
 	private static double getAtPrecision( double s ) {
 		return Math.round( s * DECIMAL ) / DECIMAL;
@@ -96,12 +98,36 @@ public class ZoomManager {
 		update( changed );		
 	}
 	
+	/**
+	 *  "pads" the viewport by the number of pixels passed.  e.g., setPadding( 100 ) instructs the
+	 *  ZoomManager to interpret it's actual viewport offset by 100 pixels in each direction (top, left,
+	 *  right, bottom), so more tiles will qualify for "visible" status when intersections are calculated.
+	 * @param pixels (int) the number of pixels to pad the viewport by
+	 */
+	public void setPadding( int pixels ) {
+		padding = pixels;
+		updateComputedViewport();
+	}
+	
 	public void updateViewport( int left, int top, int right, int bottom ) {
 		viewport.set( left, top, right, bottom );
+		updateComputedViewport();
+	}
+	
+	private void updateComputedViewport() {
+		computedViewport.set( viewport );
+		computedViewport.top -= padding;
+		computedViewport.left -= padding;
+		computedViewport.bottom += padding;
+		computedViewport.right += padding;
 	}
 	
 	public Rect getViewport() {
 		return viewport;
+	}
+	
+	public Rect getComputedViewport() {		
+		return computedViewport;
 	}
 	
 	private void update( boolean changed ){

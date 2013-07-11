@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -15,6 +14,7 @@ import com.qozix.layouts.ScalingLayout;
 import com.qozix.mapview.zoom.ZoomLevel;
 import com.qozix.mapview.zoom.ZoomListener;
 import com.qozix.mapview.zoom.ZoomManager;
+import com.qozix.widgets.AsyncTask;
 
 public class TileManager extends ScalingLayout implements ZoomListener {
 

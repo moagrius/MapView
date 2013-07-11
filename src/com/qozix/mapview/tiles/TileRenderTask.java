@@ -3,7 +3,8 @@ package com.qozix.mapview.tiles;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 
-import android.os.AsyncTask;
+import com.qozix.widgets.AsyncTask;
+
 
 class TileRenderTask extends AsyncTask<Void, MapTile, Void> {
 

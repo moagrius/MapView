@@ -24,6 +24,7 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 	private String downsample;
 
 	private ZoomManager zoomManager;
+	private Rect viewport = new Rect();
 
 	public ZoomLevel( ZoomManager zm, int mw, int mh, String p ) {
 		this( zm, mw, mh, p, null, DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE );
@@ -50,45 +51,21 @@ public class ZoomLevel implements Comparable<ZoomLevel> {
 		area = (long) ( mapWidth * mapHeight );
 	}
 
-	private LinkedList<MapTile> __getIntersections() {
-		int zoom = zoomManager.getZoom();
-		double scale = zoomManager.getRelativeScale();
-		double offsetWidth = tileWidth * scale;
-		double offsetHeight = tileHeight * scale;
-		LinkedList<MapTile> intersections = new LinkedList<MapTile>();
-		Rect boundedRect = new Rect( zoomManager.getViewport() );
-		boundedRect.top = Math.max( boundedRect.top, 0 );
-		boundedRect.left = Math.max( boundedRect.left, 0 );
-		boundedRect.right = Math.min( boundedRect.right, mapWidth );
-		boundedRect.bottom = Math.min( boundedRect.bottom, mapHeight );
-		int sr = (int) Math.floor( boundedRect.top / offsetHeight );
-		int er = (int) Math.ceil( boundedRect.bottom / offsetHeight );
-		int sc = (int) Math.floor( boundedRect.left / offsetWidth );
-		int ec = (int) Math.ceil( boundedRect.right / offsetWidth );
-		for ( int r = sr; r <= er; r++ ) {
-			for ( int c = sc; c <= ec; c++ ) {
-				MapTile m = new MapTile( zoom, r, c, tileWidth, tileHeight, pattern );
-				intersections.add( m );
-			}
-		}
-		return intersections;
-	}
-
 	public LinkedList<MapTile> getIntersections() {
 		int zoom = zoomManager.getZoom();
 		double scale = zoomManager.getRelativeScale();
 		double offsetWidth = tileWidth * scale;
 		double offsetHeight = tileHeight * scale;
 		LinkedList<MapTile> intersections = new LinkedList<MapTile>();
-		Rect boundedRect = new Rect( zoomManager.getViewport() );
-		boundedRect.top = Math.max( boundedRect.top, 0 );
-		boundedRect.left = Math.max( boundedRect.left, 0 );
-		boundedRect.right = Math.min( boundedRect.right, (int) ( mapWidth * scale ) );
-		boundedRect.bottom = Math.min( boundedRect.bottom, (int) ( mapHeight * scale ) );
-		int sr = (int) Math.floor( boundedRect.top / offsetHeight );
-		int er = (int) Math.ceil( boundedRect.bottom / offsetHeight );
-		int sc = (int) Math.floor( boundedRect.left / offsetWidth );
-		int ec = (int) Math.ceil( boundedRect.right / offsetWidth );
+		viewport.set( zoomManager.getComputedViewport() );
+		viewport.top = Math.max( viewport.top, 0 );
+		viewport.left = Math.max( viewport.left, 0 );
+		viewport.right = Math.min( viewport.right, (int) ( mapWidth * scale ) );
+		viewport.bottom = Math.min( viewport.bottom, (int) ( mapHeight * scale ) );
+		int sr = (int) Math.floor( viewport.top / offsetHeight );
+		int er = (int) Math.ceil( viewport.bottom / offsetHeight );
+		int sc = (int) Math.floor( viewport.left / offsetWidth );
+		int ec = (int) Math.ceil( viewport.right / offsetWidth );
 		for ( int r = sr; r < er; r++ ) {
 			for ( int c = sc; c < ec; c++ ) {
 				MapTile m = new MapTile( zoom, r, c, tileWidth, tileHeight, pattern );

@@ -181,11 +181,35 @@ public class MapView extends ZoomPanLayout {
 	 * Sets a custom class to perform the decode operation when tile bitmaps are requested.
 	 * By default, a MapTileDecoder implementation is provided that renders bitmaps from the context's Assets,
 	 * but alternative implementations could be used that fetch images via HTTP, or from the SD card, or resources, SVG, etc.
+	 * This signature is identical to calling setTileDecoder and setDownsampleDecoder with the same decoder instance as the parameter.
+	 * {@link MapTileDecoderHttp} is an example of such an implementation.
+	 * @param decoder (MapTileDecoder) A class instance that implements MapTileDecoder, and must define a decode method, which accepts a String file name and a Context object, and returns a Bitmap
+	 */
+	public void setDecoder( MapTileDecoder decoder ) {
+		setTileDecoder( decoder );
+		setDownsampleDecoder( decoder );
+	}
+	
+	/**
+	 * Sets a custom class to perform the decode operation when tile bitmaps are requested for tile images only.
+	 * By default, a MapTileDecoder implementation is provided that renders bitmaps from the context's Assets,
+	 * but alternative implementations could be used that fetch images via HTTP, or from the SD card, or resources, SVG, etc.
 	 * {@link MapTileDecoderHttp} is an example of such an implementation.
 	 * @param decoder (MapTileDecoder) A class instance that implements MapTileDecoder, and must define a decode method, which accepts a String file name and a Context object, and returns a Bitmap
 	 */
 	public void setTileDecoder( MapTileDecoder decoder ) {
 		tileManager.setDecoder( decoder );
+	}
+	
+	/**
+	 * Sets a custom class to perform the decode operation when tile bitmaps are requested for downsample images only.
+	 * By default, a MapTileDecoder implementation is provided that renders bitmaps from the context's Assets,
+	 * but alternative implementations could be used that fetch images via HTTP, or from the SD card, or resources, SVG, etc.
+	 * {@link MapTileDecoderHttp} is an example of such an implementation.
+	 * @param decoder (MapTileDecoder) A class instance that implements MapTileDecoder, and must define a decode method, which accepts a String file name and a Context object, and returns a Bitmap
+	 */
+	public void setDownsampleDecoder( MapTileDecoder decoder ) {
+		downsampleManager.setDecoder( decoder );
 	}
 	
 	//------------------------------------------------------------------------------------
@@ -277,6 +301,16 @@ public class MapView extends ZoomPanLayout {
 	 */
 	public void unlockZoom(){
 		zoomManager.unlockZoom();
+	}
+	
+	/**
+	 *  "pads" the viewport by the number of pixels passed.  e.g., setViewportPadding( 100 ) instructs the
+	 *  MapView to interpret it's actual viewport offset by 100 pixels in each direction (top, left,
+	 *  right, bottom), so more tiles will qualify for "visible" status when intersections are calculated.
+	 * @param padding (int) the number of pixels to pad the viewport by
+	 */
+	public void setViewportPadding( int padding ) {
+		zoomManager.setPadding( padding );
 	}
 	
 	//------------------------------------------------------------------------------------
