@@ -8,7 +8,6 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 
 import com.qozix.geom.Coordinate;
@@ -19,6 +18,7 @@ import com.qozix.mapview.markers.CalloutManager;
 import com.qozix.mapview.markers.MarkerManager;
 import com.qozix.mapview.paths.PathManager;
 import com.qozix.mapview.tiles.MapTileDecoder;
+import com.qozix.mapview.tiles.MapTileDecoderHttp;
 import com.qozix.mapview.tiles.TileManager;
 import com.qozix.mapview.tiles.TileRenderListener;
 import com.qozix.mapview.viewmanagers.DownsampleManager;
@@ -429,10 +429,8 @@ public class MapView extends ZoomPanLayout {
 	 * @param absolute (boolean) true to always use pixel values and omit geolocation translation
 	 */
 	public void moveTo( double x, double y, boolean absolute ) {
-		int[] position = getPosition( x, y, absolute );
+		int[] position = getPosition( x, y, absolute, true );
 		Point point = new Point( position[0], position[1] );
-		point.x *= getScale();
-		point.y *= getScale();
 		scrollToPoint( point );
 	}
 	
@@ -458,10 +456,8 @@ public class MapView extends ZoomPanLayout {
 	 * @param absolute (boolean) true to always use pixel values and omit geolocation translation
 	 */
 	public void moveToAndCenter( double x, double y, boolean absolute ) {
-		int[] position = getPosition( x, y, absolute );
+		int[] position = getPosition( x, y, absolute, true );
 		Point point = new Point( position[0], position[1] );
-		point.x *= getScale();
-		point.y *= getScale();
 		scrollToAndCenter( point );
 	}
 	
@@ -487,10 +483,8 @@ public class MapView extends ZoomPanLayout {
 	 * @param absolute (boolean) true to always use pixel values and omit geolocation translation
 	 */
 	public void slideTo( double x, double y, boolean absolute ){
-		int[] position = getPosition( x, y, absolute );
+		int[] position = getPosition( x, y, absolute, true );
 		Point point = new Point( position[0], position[1] );
-		point.x *= getScale();
-		point.y *= getScale();
 		slideToPoint( point );
 	}
 	
@@ -516,10 +510,8 @@ public class MapView extends ZoomPanLayout {
 	 * @param absolute (boolean) true to always use pixel values and omit geolocation translation
 	 */	
 	public void slideToAndCenter( double x, double y, boolean absolute ) {
-		int[] position = getPosition( x, y, absolute );
+		int[] position = getPosition( x, y, absolute, true );
 		Point point = new Point( position[0], position[1] );
-		point.x *= getScale();
-		point.y *= getScale();
 		slideToAndCenter( point );
 	}
 	
@@ -919,15 +911,24 @@ public class MapView extends ZoomPanLayout {
 
 	// private geolocation helper
 	private int[] getPosition( double x, double y, boolean absolute ){
+		return getPosition( x, y, absolute, false );
+	}
+	
+	private int[] getPosition( double x, double y, boolean absolute, boolean shouldScale ){
 		int[] position = new int[2];
 		if ( !absolute && isUsingGeolocation ){
 			Coordinate c = new Coordinate( x, y );
 			Point p = geolocator.translate( c );
-			x = p.x;
-			y = p.y;
+			position[0] = p.x;
+			position[1] = p.y;
+		} else {
+			position[0] = (int) x;
+			position[1] = (int) y;
 		}
-		position[0] = (int) x;
-		position[1] = (int) y;
+		if( shouldScale ) {
+			position[0] *= getScale();
+			position[1] *= getScale();
+		}		
 		return position;
 	}
 	
