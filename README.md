@@ -1,3 +1,6 @@
+<p><strong>Update (August 5, 2013)</strong></p>
+<p>This widget has been superceded by <a href="https://github.com/moagrius/TileView">TileView</a></p>.  All future commits will be to TileView.  MapView will be eventually discontinued entirely as TileView supercedes it.</p>
+
 <p><strong>Update (April 20, 2013):</strong></p>
 <p>
     Updating to 1.0.2, fixing a couple bugs, adding support for custom Bitmap decoders, improved intersection calculation
